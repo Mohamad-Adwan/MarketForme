@@ -40,7 +40,11 @@ export interface Order {
     itemname: string;
     quantity: number;
     price: number;
-    image: string;
+    image: {
+      data: Buffer; // use Buffer if you're storing raw binary data
+      contentType: string;
+      FileName: string;
+    },
   }[];
 }
 

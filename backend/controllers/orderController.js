@@ -168,15 +168,51 @@ const {Product} = require('../models/productModel'); // Assuming you have a Prod
 const orderController = {
   // Get all orders for a specific user
   getOrders: async (req, res) => {
+    const  userId  = req.params.id; // id here is the userId
+  
     try {
-      const userId = req.params.id; // assuming user ID is passed as a parameter (not parsing into int)
-      const orders = await Order.find({ nuser_id: userId }); // Corrected to match the correct field name for userId
-      res.json(orders);
+      const orders = await Order.find({ nuser_Id:userId});
+  
+      if (!orders || orders.length === 0) {
+        return res.status(404).json({ message: 'No orders found for this user' });
+      }
+  
+      const formattedOrders = orders.map(order => {
+        const itemsWithBase64Images = order.items.map(item => {
+          const base64Image =
+            item.image && item.image.data && Buffer.isBuffer(item.image.data)
+              ? `data:${item.image.contentType};base64,${item.image.data.toString('base64')}`
+              : null;
+  
+          return {
+            id1: item.id1,
+            itemname: item.itemname,
+            quantity: item.quantity,
+            price: item.price,
+            image: base64Image,
+          };
+        });
+  
+        return {
+          orderId: order._id,
+          userId: order.userId,
+          userName: order.userName,
+          total: order.total,
+          phone: order.phone,
+          status: order.status,
+          date: order.date,
+          items: itemsWithBase64Images
+        };
+      });
+  
+      res.json(formattedOrders);
+  
     } catch (error) {
       console.error('Error fetching user orders:', error);
-      res.status(500).json({ error: 'Failed to fetch orders' });
+      res.status(500).json({ message: 'Error fetching orders', error });
     }
-  },
+  }
+,  
   getDashboard: async (req, res) => {
     try {
       // Fetch only orders with status 'delivered'
@@ -288,12 +324,20 @@ const fullProductDetails = await Product.find({ id1: { $in: topProductIds } });
           message: 'Please verify your phone number before creating orders'
         });
       }
+      
       ////here edite
       for (const item of orderData.items) {
         const product = await Product.findOne({ id1: item.id1 });
+      
         if (!product || product.stock < item.quantity) {
           return res.status(400).json({ error: `Insufficient stock for product: ${item.itemname}` });
         }
+      
+        item.image = {
+          data: product.image.data,
+          contentType: product.image.contentType,
+          FileName: product.image.FileName
+        };
       }
      console.log('User found:', orderData);
       const newOrder = new Order({
@@ -306,7 +350,10 @@ const fullProductDetails = await Product.find({ id1: { $in: topProductIds } });
           id1: item.id1, // Corrected field name to match your schema
           quantity: item.quantity,
           price: item.price,
-          image:item.image,
+          image:{data:item.image.data,
+            contentType:item.image.contentType,
+            FileName:item.image.FileName
+          },
           itemname:item.itemname
 
         }))
@@ -325,17 +372,40 @@ const fullProductDetails = await Product.find({ id1: { $in: topProductIds } });
     try {
       const orderId = req.params.orderId; // assuming orderId is a string, no need for parsing into int
       const order = await Order.findOne({ id2: orderId }); // Correct field name for order ID
-
+  
       if (!order) {
         return res.status(404).json({ error: 'Order not found' });
       }
-
-      res.json(order);
+  
+      // Map through the items and convert image data to Base64
+      const updatedItems = order.items.map(item => {
+        // Convert image data to Base64 if available
+        const base64Image =
+          item.image && item.image.data && Buffer.isBuffer(item.image.data)
+            ? `data:${item.image.contentType};base64,${item.image.data.toString('base64')}`
+            : null;
+        
+        // Return item with Base64 image
+        return {
+          ...item,  // Spread original item data
+          image: base64Image  // Add Base64 encoded image (or null if no image)
+        };
+      });
+  
+      // Return the order with the updated items
+      const orderWithBase64Images = {
+        ...order.toObject(),  // Convert order to plain object
+        items: updatedItems     // Replace items with the updated ones
+      };
+  
+      // Respond with order having Base64 encoded images
+      res.json(orderWithBase64Images);
     } catch (error) {
       console.error('Error fetching order details:', error);
       res.status(500).json({ error: 'Failed to fetch order details' });
     }
   },
+  
   edititemQuantity: async (req, res) => {
     try {
       itemId = req.params.itemId; // Assuming you're passing the item ID as a parameter
@@ -408,6 +478,12 @@ const fullProductDetails = await Product.find({ id1: { $in: topProductIds } });
       //////here edit
       if (status === 'delivered') {
         const order = await Order.findOne({ id2: orderId });
+        const user = await User.findOne({ id: order.userId });
+        if (!user) {
+          return res.status(404).json({ error: 'User not found' });
+        }
+        user.ordersCount += 1; // Increment the user's orders count
+        await user.save();
         for (const item of order.items) {
           const product = await Product.findOne({ id1: item.id1 });
           if (product) {
@@ -473,12 +549,44 @@ const fullProductDetails = await Product.find({ id1: { $in: topProductIds } });
   getAllOrders: async (req, res) => {
     try {
       const orders = await Order.find();
-      res.json(orders);
+  
+      if (!orders || orders.length === 0) {
+        return res.status(404).json({ message: 'No orders found' });
+      }
+  
+      const ordersWithBase64Images = orders.map(order => {
+        const updatedItems = order.items.map(item => {
+          const base64Image =
+            item.image && item.image.data && Buffer.isBuffer(item.image.data)
+              ? `data:${item.image.contentType};base64,${item.image.data.toString('base64')}`
+              : null;
+  
+          return {
+            id1: item.id1,
+            itemname: item.itemname,
+            quantity: item.quantity,
+            price: item.price,
+            image: base64Image
+          };
+        });
+  
+        return {
+          id2: order.id2,
+          userId: order.userId,
+          userName: order.userName,
+          total: order.total,
+          status: order.status,
+          date: order.date,
+          items: updatedItems
+        };
+      });
+      res.json(ordersWithBase64Images);
+  
     } catch (error) {
       console.error('Error fetching all orders:', error);
-      res.status(500).json({ error: 'Failed to fetch orders' });
+      res.status(500).json({ message: 'Failed to fetch orders', error });
     }
-  },
+  },  
   
   // Delete order by ID
   deleteOrder: async (req, res) => {

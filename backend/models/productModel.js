@@ -127,7 +127,15 @@ const productSchema = new mongoose.Schema({
   stock: Number,
   category: String,
   featured: Boolean,
-  image: { type: String }, // Store the image as binary data (Buffer)
+ // image: { type: String }, // Store the image as binary data (Buffer)
+  image: {
+    data: Buffer,
+    contentType: String,
+    FileName: String,
+  },
+  // imagePath: { type: String }, // Store the path to the image file
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 }, { timestamps: true });
 
 // Add auto-increment plugin to schema

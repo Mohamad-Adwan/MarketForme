@@ -69,7 +69,11 @@ const cartSchema = new mongoose.Schema({
       id1: String, // or id1
       quantity: Number,
       price: Number,
-      image: String,
+      image: {
+        data: Buffer,
+        contentType: String,
+        FileName: String,
+      },
       itemname:String,
     }
   ]

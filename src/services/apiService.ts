@@ -6,6 +6,11 @@ interface RequestOptions extends RequestInit {
   headers?: Record<string, string>;
   body?: string;
 }
+export interface RequestOptionsdata {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: string | FormData; // 👈 allow both JSON and FormData
+}
 
 // Base API request function
 const apiRequest = async (endpoint: string, options: RequestOptions = {}) => {
@@ -34,23 +39,64 @@ const apiRequest = async (endpoint: string, options: RequestOptions = {}) => {
     throw error;
   }
 };
+function isFormData(value: any): value is FormData {
+  return typeof value === 'object' && value instanceof FormData;
+}
+
+const apiRequestdata = async (endpoint: string, options: RequestOptionsdata = {}) => {
+  const url = `${dbConfig.apiUrl}/${endpoint}`;
+
+  try {
+    const formDataUsed = isFormData(options.body);
+
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        ...(formDataUsed ? {} : { 'Content-Type': 'application/json' }),
+        ...options.headers,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || errorData.error || `API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('API request failed:', error);
+    throw error;
+  }
+};
 
 // Product API functions
 export const productApi = {
   getAll: () => apiRequest('products'),
-  getById: (id1: number) => apiRequest(`products/${id1}`),
+  getProductById: (id1: number) => apiRequest(`products/${id1}`),
   getDashboard: () => apiRequest('products/Dasdashboard'),
   getFeatured: () => apiRequest('products/featured'),
   getByCategory: (category: string) => apiRequest(`products/category/${category}`),
-  addProduct: (productData: Partial<Product>) => 
-    apiRequest('products', {
+  // addProduct: (productData: Partial<Product>) => 
+  //   apiRequest('products', {
+  //     method: 'POST',
+  //     body: JSON.stringify(productData),
+  //   }),
+  addProduct: (formData: FormData) =>
+    apiRequestdata('products', {
       method: 'POST',
-      body: JSON.stringify(productData),
+      body: formData, // ✅ Send FormData directly
+      // ⚠️ Do NOT set Content-Type, the browser will set it with correct boundary
     }),
-  updateProduct: (id: number, productData: Partial<Product>) => 
-    apiRequest(`products/${id}`, {
+  // updateProduct: (id: number, productData: Partial<Product>) => 
+  //   apiRequest(`products/${id}`, {
+  //     method: 'PUT',
+  //     body: JSON.stringify(productData),
+  //   }),
+   updateProduct: (id: number, formData: FormData) => 
+    apiRequestdata(`products/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(productData),
+      body: formData, 
     }),
   deleteProduct: (id1: number) => 
     apiRequest(`products/${id1}`, {
@@ -161,13 +207,13 @@ export const authApi = {
 // Cart API functions
 export const cartApi = {
   getCart: (userId: string) => apiRequest(`cart/${userId}`),
-  addToCart: (userId: string, id1: number, quantity: number, price: number,image:string,itemname:string) =>
+  addToCart: (userId: string, id1: number, quantity: number, price: number,itemname:string) =>
     apiRequest(`cart/${userId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ id1, quantity, price ,image,itemname})
+      body: JSON.stringify({ id1, quantity, price ,itemname}),
     }),
   updateCartItem: (userId: string, id1: number, quantity: number) => 
     apiRequest(`cart/${userId}/item/${id1}`, {
@@ -188,7 +234,10 @@ export const cartApi = {
 export const orderApi = {
   getDashboard: () => apiRequest('orders/Dasdashboard'),
 
-  getOrders: (userId: string) => apiRequest(`orders/order/${userId}`),
+  getOrders: (token: string,userId: string) => 
+    apiRequest(`orders/order/${userId}`,{
+      headers: { Authorization: `Bearer ${token}` },
+    }),
   getAllOrders: (token: string) => 
     apiRequest('orders', {
       headers: { Authorization: `Bearer ${token}` },

@@ -46,66 +46,149 @@
 // module.exports = cartController;
 const Cart = require('../models/cartModel');
 const Order = require('../models/orderModel');  // Import the Order model
+const {Product} = require('../models/productModel');  // Import the Order model
 
 const cartController = {
   // Get cart
   getCart: async (req, res) => {
     const { userId } = req.params;
-    
+  
     try {
       const cart = await Cart.findOne({ userId });
-
+  
       if (!cart) return res.status(404).json({ message: 'Cart not found' });
-
-      res.json(cart);
+  
+      const cartsWithBase64Images = cart.items.map(item => {
+        const base64Image =
+          item.image && item.image.data && Buffer.isBuffer(item.image.data)
+            ? `data:${item.image.contentType};base64,${item.image.data.toString('base64')}`
+            : null;
+  
+        return {
+          id1: item.id1,
+          name: item.itemname,
+          quantity: item.quantity,
+          price: item.price,
+          image: base64Image,
+          
+        };
+      });
+  
+      res.json({
+        userId: cart.userId,
+        items: cartsWithBase64Images
+      });
+  
     } catch (err) {
       res.status(500).json({ message: 'Error fetching cart', error: err });
     }
   },
+  
 
   // Add to cart
+  // addToCart: async (req, res) => {
+  //   const { userId } = req.params;
+  //   const { id1, quantity, price,image,itemname } = req.body;
+  //   console.log("itemname in addToCart:", itemname);
+  //   console.log("Image in addToCart:", image);
+  //   try {
+  //     //const imagee = image.match(/^data:image\/([a-zA-Z]*);base64,([^\"]*)$/);
+  //     let cart = await Cart.findOne({ userId:userId });
+
+  //     if (!cart) {
+  //       cart = new Cart({
+  //         userId,
+  //         items: [{ id1, quantity, price,image,itemname }],
+  //       });
+
+  //     } else {
+  //       // Find the index of the item with the matching id1
+  //       const itemIndex = cart.items.findIndex(item => item.id1 === String(id1));
+        
+        
+  //       // Also log the items in the cart to see what's inside
+        
+  //       if (itemIndex !== -1) {
+  //         // If the item exists, increment the quantity by 1
+  //         cart.items[itemIndex].quantity += 1;
+  //         //console.log("Item already exists, incrementing quantity");
+  //       } else {
+  //         // If the item doesn't exist, add it with a quantity of 1
+  //         cart.items.push({ id1, quantity: 1, price,imagee,itemname });
+  //        // console.log("Item added to cart");
+  //       }
+  //     }
+
+  //     await cart.save();
+
+  //     res.json(cart);
+
+  //   } catch (err) {
+  //     res.status(500).json({ message: 'Error adding item to cart', error: err });
+  //   }
+  // },
   addToCart: async (req, res) => {
     const { userId } = req.params;
-    const { id1, quantity, price,image,itemname } = req.body;
-    console.log("itemname in addToCart:", itemname);
-    console.log("Image in addToCart:", image);
+    const { id1, quantity, price, itemname} = req.body;
+  
+   
+  const product =await Product.findOne({ id1: id1 });
     try {
-      //const imagee = image.match(/^data:image\/([a-zA-Z]*);base64,([^\"]*)$/);
-      let cart = await Cart.findOne({ userId:userId });
-
+      let cart = await Cart.findOne({ userId: userId });
+  
+      // If no cart exists, create a new one
       if (!cart) {
         cart = new Cart({
           userId,
-          items: [{ id1, quantity, price,image,itemname }],
+          items: [{
+            id1,
+            quantity,
+            price,
+            itemname,
+            image: {
+              data: product.image.data, 
+              contentType: product.image.contentType,
+              FileName: product.image.FileName
+              
+            }
+          }],
         });
-
       } else {
-        // Find the index of the item with the matching id1
+        // Find if the item already exists in the cart
         const itemIndex = cart.items.findIndex(item => item.id1 === String(id1));
-        
-        
-        // Also log the items in the cart to see what's inside
-        
+  
         if (itemIndex !== -1) {
-          // If the item exists, increment the quantity by 1
-          cart.items[itemIndex].quantity += 1;
-          //console.log("Item already exists, incrementing quantity");
-        } else {
-          // If the item doesn't exist, add it with a quantity of 1
-          cart.items.push({ id1, quantity: 1, price,imagee,itemname });
-         // console.log("Item added to cart");
+          // If the item exists, update the quantity
+          cart.items[itemIndex].quantity += quantity; // Increment by the quantity sent
+          console.log("Item already exists, incrementing quantity");
+        }  else {
+          // If the item doesn't exist, add it to the cart
+          cart.items.push({
+            id1,
+            quantity,
+            price,
+            itemname,
+            image: {
+              data: product.image.data,
+              contentType: product.image.contentType,
+              FileName: product.image.FileName
+            }
+          });
+          console.log("Item added to cart");
         }
       }
-
+  
+      // Save the updated cart
       await cart.save();
-
+  
+      // Return the updated cart
       res.json(cart);
-
+  
     } catch (err) {
       res.status(500).json({ message: 'Error adding item to cart', error: err });
     }
   },
-
+  
   // Update cart item
   updateCartItem: async (req, res) => {
     const { userId, id1 } = req.params;
@@ -131,23 +214,31 @@ const cartController = {
   // Remove from cart
   removeFromCart: async (req, res) => {
     const { userId, id1 } = req.params;
-
+  
     try {
       const cart = await Cart.findOne({ userId });
-
+  
       if (!cart) return res.status(404).json({ message: 'Cart not found' });
-
+  
       const itemIndex = cart.items.findIndex(item => item.id1 === String(id1));
       if (itemIndex === -1) return res.status(404).json({ message: 'Item not found' });
-
-      cart.items.splice(itemIndex, 1); // Remove the item
+  
+      // Remove the item
+      cart.items.splice(itemIndex, 1);
+  
+      if (cart.items.length === 0) {
+        // If the cart is now empty, delete the entire cart
+        await Cart.deleteOne({ userId });
+        return res.json({ message: 'Item removed and cart cleared because it was the last item' });
+      }
+  
       await cart.save();
-
-      res.json(cart);
+      res.json({ message: 'Item removed', cart });
+  
     } catch (err) {
       res.status(500).json({ message: 'Error removing item from cart', error: err });
     }
-  },
+  },  
 
   // Clear cart
   clearCart: async (req, res) => {

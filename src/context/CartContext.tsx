@@ -235,6 +235,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const cart = await cartApi.getCart(user.id);
         setCartItems(cart.items || []);
+        console.log('Cart loaded from API:', cart);
       } catch (error) {
         console.error('Failed to fetch cart, falling back to localStorage:', error);
         // const savedCart = localStorage.getItem(`cart_${user.id}`);
@@ -266,7 +267,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Attempt API call, continue even if it fails
       try {
-        await cartApi.addToCart(user.id, product.id1, quantity, product.price, product.image,product.name);
+        await cartApi.addToCart(user.id, product.id1, 1, product.price, product.name);
       } catch (error) {
         console.error('API request failed:', error);
         toast.warning("Added to cart locally. Changes will sync when connection is restored.");

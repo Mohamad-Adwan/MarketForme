@@ -677,7 +677,7 @@ interface ProductsManagementProps {
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   selectedImage: File | null;
   fileInputRef: React.RefObject<HTMLInputElement>;
-  handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  // handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const ProductsManagement: React.FC<ProductsManagementProps> = ({
@@ -686,12 +686,22 @@ const ProductsManagement: React.FC<ProductsManagementProps> = ({
   editingProduct,
   setEditingProduct,
   handleChange,
-  selectedImage,
+  // selectedImage,
   fileInputRef,
-  handleImageChange,
+  // handleImageChange,
 }) => {
-  const [product, setProducts] = useState<Product[]>([]);
+ // const [product, setProducts] = useState<Product[]>([]);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [product, setProducts] = useState([]);
 
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedImage(file);
+      // Optional: Upload it here
+      // uploadFile(file);
+    }
+  };
   // Add Product Logic
   const handleAddProduct = async () => {
     const newProduct: Product = {
@@ -716,31 +726,51 @@ const ProductsManagement: React.FC<ProductsManagementProps> = ({
     }
 
     try {
-      let uploadedImageUrl = editingProduct.image;
-
-      if (selectedImage) {
-        const formData = new FormData();
-        formData.append('image', selectedImage);
-        const uploadedImage = await productApi.uploadImage(formData);
-        uploadedImageUrl = uploadedImage.url;
+      const formData = new FormData();
+    if (selectedImage) {
+      formData.append('image', selectedImage);
+    }
+    for (const key in editingProduct) {
+      if (Object.prototype.hasOwnProperty.call(editingProduct, key)) {
+        formData.append(key, editingProduct[key]);
       }
+    }
+      // const uploadedImageUrl = selectedImage;
 
-      const updatedProduct = {
-        ...editingProduct,
-        image: uploadedImageUrl,
-      };
+      // if (selectedImage) {
+      //   const formData = new FormData();
+      //   formData.append('image', selectedImage);
+      //   const uploadedImage = await productApi.uploadImage(formData);
+      //   uploadedImageUrl = uploadedImage.url;
+      // }
 
-      if (updatedProduct.id1 === 0) {
+      // const updatedProduct = {
+      //   ...editingProduct,
+      //   image: uploadedImageUrl,
+      // };
+
+      // if (updatedProduct.id1 === 0) {
+      //   // Add Product
+      //   const addedProduct = await productApi.addProduct(updatedProduct);
+      //   setProducts((prevProducts) => [...prevProducts, addedProduct]);
+      //   toast.success('Product added successfully');
+      // } else {
+      //   // Update Product
+      //   await productApi.updateProduct(updatedProduct.id1, updatedProduct);
+      //   setProducts((prevProducts) =>
+      //     prevProducts.map((p) => (p.id1 === updatedProduct.id1 ? updatedProduct : p))
+      //   );
+      //   toast.success('Product updated successfully');
+      // }
+      if (editingProduct.id1 === 0) {
         // Add Product
-        const addedProduct = await productApi.addProduct(updatedProduct);
+        const addedProduct = await productApi.addProduct(formData); // <-- pass formData
         setProducts((prevProducts) => [...prevProducts, addedProduct]);
         toast.success('Product added successfully');
       } else {
-        // Update Product
-        await productApi.updateProduct(updatedProduct.id1, updatedProduct);
-        setProducts((prevProducts) =>
-          prevProducts.map((p) => (p.id1 === updatedProduct.id1 ? updatedProduct : p))
-        );
+        // Update Product (you may need to handle this separately)
+        await productApi.updateProduct(editingProduct.id1, formData);
+        
         toast.success('Product updated successfully');
       }
 
@@ -767,6 +797,7 @@ const ProductsManagement: React.FC<ProductsManagementProps> = ({
     const fetchProducts = async () => {
       try {
         const data = await productApi.getAll();
+        console.log('Fetched products:', data);
         setProducts(data);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -808,8 +839,11 @@ const ProductsManagement: React.FC<ProductsManagementProps> = ({
                 <TableCell>${product.price}</TableCell>
                 <TableCell>{product.category}</TableCell>
                 <TableCell>{product.stock}</TableCell>
+                
                 <TableCell>
+                    
                   <img
+                  
                     src={product.image}
                     alt={product.name}
                     className="w-10 h-10 object-cover"
@@ -924,7 +958,7 @@ const ProductsManagement: React.FC<ProductsManagementProps> = ({
             </div>
 
             <div className="flex items-center space-x-2">
-              <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
+              <Button variant="outline" onClick={() => fileInputRef.current.click()}>
                 <Upload className="w-4 h-4 mr-1" />
                 Upload Image
               </Button>

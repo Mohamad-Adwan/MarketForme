@@ -162,7 +162,7 @@ const HomePage = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
-              Welcome to ShopEase
+              Welcome to Tech-Shop
             </h1>
             <p className="text-lg text-muted-foreground mb-8">
               Discover our premium selection of products for all your needs.

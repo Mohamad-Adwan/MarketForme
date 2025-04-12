@@ -60,27 +60,27 @@ const OrdersPage = () => {
   const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
   
   // Load pending orders from localStorage
-  useEffect(() => {
-    if (user) {
-      const storedPendingOrders = localStorage.getItem('pendingOrders');
-      if (storedPendingOrders) {
-        try {
-          const parsedOrders = JSON.parse(storedPendingOrders);
-          // Filter to only show orders for current user
-          const userPendingOrders = parsedOrders.filter((order: Order) => 
-            order.userId === user.id
-          );
-          setPendingOrders(userPendingOrders);
-        } catch (e) {
-          console.error('Error parsing pending orders:', e);
-        }
-      }
-    }
-  }, [user]);
-  
+  // useEffect(() => {
+  //   if (user) {
+  //     const storedPendingOrders = localStorage.getItem('pendingOrders');
+  //     if (storedPendingOrders) {
+  //       try {
+  //         const parsedOrders = JSON.parse(storedPendingOrders);
+  //         // Filter to only show orders for current user
+  //         const userPendingOrders = parsedOrders.filter((order: Order) => 
+  //           order.userId === user.id
+  //         );
+  //         setPendingOrders(userPendingOrders);
+  //       } catch (e) {
+  //         console.error('Error parsing pending orders:', e);
+  //       }
+  //     }
+  //   }
+  // }, [user]);
+  const token =localStorage.getItem("authToken")
   const { data: orders, isLoading, error, refetch } = useQuery({
-    queryKey: ['orders', user?.id],
-    queryFn: () => user ? orderApi.getOrders(user.id) : Promise.resolve([]),
+    queryKey: ['orders', user.id],
+    queryFn: () => user ? orderApi.getOrders(token,user.id) : Promise.resolve([]),
     enabled: !!user && !useMockData,
     meta: {
       onError: (err: Error) => {
@@ -110,18 +110,24 @@ const OrdersPage = () => {
       // })), ...pendingOrders];
     } else if (orders && pendingOrders.length > 0) {
       // Return API orders + pending orders
+      console.log('API orders:', orders);
+      console.log('Pending orders:', pendingOrders);
       return [...orders, ...pendingOrders];
     } else if (orders) {
       // Just API orders
+      console.log('API orders:', orders);
+
       return orders;
     } else if (pendingOrders.length > 0) {
       // Just pending orders
+      console.log('Pending orders:', pendingOrders);
       return pendingOrders;
     }
     return [];
   };
   
   const displayOrders = getDisplayOrders();
+  console.log('Display orders:', displayOrders);
   
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -242,7 +248,7 @@ const OrdersPage = () => {
                     </div>
                     <Badge className={getStatusColor(order.status)}>
                       {order.status}
-                      {!order.id2 && " (Local)"}
+                      {/* {!order.id2 && " (Local)"} */}
                     </Badge>
                   </div>
                   
@@ -251,8 +257,8 @@ const OrdersPage = () => {
                           <thead>
                             <tr>
                               <th className="text-left">Item</th>
-                              <th className="text-left">Quantity</th>
                               <th className="text-left">Image</th>
+                              <th className="text-left">Quantity</th>
                               <th className="text-left">Price</th>
                             </tr>
                           </thead>

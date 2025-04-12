@@ -667,137 +667,137 @@ const OrdersManagement: React.FC = () => {
                         <TableCell colSpan={7} className="bg-gray-100">
                           <ul>
                             {Array.isArray(order.items) && order.items.length ? (
-                              order.items.map((item, index) => (
-                                <li key={index} className="py-1 pl-4">
-                        <table className="w-full">
-                          <thead>
-                            <tr>
-                              <th className="text-left">Item</th>
-                              <th className="text-left">Quantity</th>
-                              <th className="text-left">Image</th>
-                              <th className="text-left">Price</th>
-                              <th className="text-left">Action</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {/* Iterate through items array for the current order */}
-                            {order.items && Array.isArray(order.items) && order.items.map((item, index) => (
-                              <tr key={index}>
-                                <td className="py-2">{item.itemname}</td>
-                                {EditingitemQuantity && EditingitemQuantity.id1 === item.id1 ? (
-                                  <td className="py-2">
-                                    <input
-                                      type="text"
-                                      onChange={handleInputChange}
-                                      className="border rounded px-2 py-1"
-                                    />
-                                   <span className="ml-2 text-gray-500 italic">item before: {item.quantity}</span>
+                                   
+                                      <li  className="py-1 pl-4">
+                                    <table className="w-full">
+                                    <thead>
+                                    <tr>
+                                    <th className="text-left">Item</th>
+                                    <th className="text-left">Quantity</th>
+                                    <th className="text-left">Image</th>
+                                    <th className="text-left">Price</th>
+                                    <th className="text-left">Action</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {/* Iterate through items array for the current order */}
+                                      {order.items && Array.isArray(order.items) && order.items.map((item, index) => (
+                                        <tr key={index}>
+                                          <td className="py-2">{item.itemname}</td>
+                                          {EditingitemQuantity && EditingitemQuantity.id1 === item.id1 ? (
+                                        <td className="py-2">
+                                          <input
+                                            type="text"
+                                            onChange={handleInputChange}
+                                            className="border rounded px-2 py-1"
+                                          />
+                                        <span className="ml-2 text-gray-500 italic">item before: {item.quantity}</span>
 
-                                  </td>
-                                ) : (
-                                <td className="py-2">{item.quantity}</td>
-                                )}
-                                <td className="py-2">
-                                  {item.image && <img src={item.image} alt={item.itemname} className="w-16 h-16" />}
-                                </td>
-                                <td className="py-2">
-                                  {item.price && <span>${item.price.toFixed(2)}</span>}
-                                </td>
-                                <td>
-                                {EditingitemQuantity && EditingitemQuantity.id1 === item.id1 ? (
-                          
-                          <div className="flex space-x-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setEditingitemQuantity(null)}
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              size="sm"
-                              onClick={() => handleedititemQuantity(order.id2,item.id1)}
-                            >
-                              Save
-                            </Button>
-                          </div>):(
-                            <div className="flex space-x-2">
-                                  <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-red-500 hover:text-white hover:bg-red-500"
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Delete
-                                </Button>
+                                        </td>
+                                      ) : (
+                                      <td className="py-2">{item.quantity}</td>
+                                      )}
+                                      <td className="py-2">
+                                        {item.image && <img src={item.image} alt={item.itemname} className="w-16 h-16" />}
+                                      </td>
+                                      <td className="py-2">
+                                        {item.price && <span>${item.price.toFixed(2)}</span>}
+                                      </td>
+                                      <td>
+                                      {EditingitemQuantity && EditingitemQuantity.id1 === item.id1 ? (
                                 
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle className="flex items-center gap-2">
-                                    <AlertTriangle className="h-5 w-5 text-red-500" />
-                                    Confirm Deletion
-                                  </AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Are you sure you want to delete order #{item.id1} ? This action cannot be undone.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => handleDeleteitem(item.id1,order.id2)}
-                                    className="bg-red-500 hover:bg-red-600"
+                                  <div className="flex space-x-2">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => setEditingitemQuantity(null)}
+                                    >
+                                      Cancel
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleedititemQuantity(order.id2,item.id1)}
+                                    >
+                                      Save
+                                    </Button>
+                                </div>):(
+                                  <div className="flex space-x-2">
+                                        <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-red-500 hover:text-white hover:bg-red-500"
+                                      >
+                                        <Trash2 className="h-4 w-4 mr-2" />
+                                        Delete
+                                      </Button>
+                                      
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle className="flex items-center gap-2">
+                                          <AlertTriangle className="h-5 w-5 text-red-500" />
+                                          Confirm Deletion
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Are you sure you want to delete order #{item.id1} ? This action cannot be undone.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                          onClick={() => handleDeleteitem(item.id1,order.id2)}
+                                          className="bg-red-500 hover:bg-red-600"
+                                        >
+                                          Delete
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    disabled={order.status === 'delivered'}
+                                    onClick={() => setEditingitemQuantity({ id1:item.id1, id2:order.id2 })}
                                   >
-                                    Delete
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              disabled={order.status === 'delivered'}
-                              onClick={() => setEditingitemQuantity({ id1:item.id1, id2:order.id2 })}
-                            >
-                              <Pencil className="h-4 w-4 mr-2" />
-                              Edit
-                            </Button>
-                            </div>
-                          )}
-                            </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </li>
+                                    <Pencil className="h-4 w-4 mr-2" />
+                                    Edit
+                                  </Button>
+                                  </div>
+                                )}
+                                  </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </li>
 
-                              ))
+                                   
+                                    
+                                  ) : (
+                                    <li className="py-1 pl-4">No items available</li>
+                                  )}
+                                </ul>
+                              </TableCell>
                               
-                            ) : (
-                              <li className="py-1 pl-4">No items available</li>
-                            )}
-                          </ul>
-                        </TableCell>
-                        
-                      </TableRow>
-                              )}
-              </React.Fragment>
-              ))}
-              </TableBody>
+                            </TableRow>
+                                            )}
+                            </React.Fragment>
+                            ))}
+                            </TableBody>
 
-                          </Table>
-                          
-                        </CardContent>
+                                </Table>
+                                
+                              </CardContent>
+                            )}
+                            </Card>
+                          ))}
+                        </div>
                       )}
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </div>
-        ):
-        
+                    </div>
+              ):
+              
 
 
 
@@ -941,8 +941,7 @@ const OrdersManagement: React.FC = () => {
                         <TableCell colSpan={7} className="bg-gray-100">
                           <ul>
                             {Array.isArray(order.items) && order.items.length ? (
-                              order.items.map((item, index) => (
-                                <li key={index} className="py-1 pl-4">
+                                <li  className="py-1 pl-4">
                         <table className="w-full">
                           <thead>
                             <tr>
@@ -955,7 +954,8 @@ const OrdersManagement: React.FC = () => {
                           </thead>
                           <tbody>
                             {/* Iterate through items array for the current order */}
-                            {order.items && Array.isArray(order.items) && order.items.map((item, index) => (
+                            {order.items && Array.isArray(order.items) && 
+                            order.items.map((item, index) => (
                               <tr key={index}>
                                 <td className="py-2">{item.itemname}</td>
                                 {EditingitemQuantity && EditingitemQuantity.id1 === item.id1 ? (
@@ -1042,12 +1042,13 @@ const OrdersManagement: React.FC = () => {
                           )}
                             </td>
                               </tr>
-                            ))}
+                            ))
+                            }
                           </tbody>
                         </table>
                       </li>
 
-                              ))
+                            
                               
                             ) : (
                               <li className="py-1 pl-4">No items available</li>
@@ -1205,8 +1206,8 @@ const OrdersManagement: React.FC = () => {
                         <TableCell colSpan={7} className="bg-gray-100">
                           <ul>
                             {Array.isArray(order.items) && order.items.length ? (
-                              order.items.map((item, index) => (
-                                <li key={index} className="py-1 pl-4">
+                              
+                                <li  className="py-1 pl-4">
                         <table className="w-full">
                           <thead>
                             <tr>
@@ -1236,7 +1237,7 @@ const OrdersManagement: React.FC = () => {
                                 <td className="py-2">{item.quantity}</td>
                                 )}
                                 <td className="py-2">
-                                  {item.image && <img src={item.image} alt={item.itemname} className="w-16 h-16" />}
+                                  {item.image && <img src={item.image} alt={item.itemname } className="w-16 h-16" />}
                                 </td>
                                 <td className="py-2">
                                   {item.price && <span>${item.price.toFixed(2)}</span>}
@@ -1311,7 +1312,7 @@ const OrdersManagement: React.FC = () => {
                         </table>
                       </li>
 
-                              ))
+                           
                               
                             ) : (
                               <li className="py-1 pl-4">No items available</li>
@@ -1466,8 +1467,8 @@ const OrdersManagement: React.FC = () => {
                         <TableCell colSpan={7} className="bg-gray-100">
                           <ul>
                             {Array.isArray(order.items) && order.items.length ? (
-                              order.items.map((item, index) => (
-                                <li key={index} className="py-1 pl-4">
+                              
+                                <li  className="py-1 pl-4">
                         <table className="w-full">
                           <thead>
                             <tr>
@@ -1572,7 +1573,7 @@ const OrdersManagement: React.FC = () => {
                         </table>
                       </li>
 
-                              ))
+                          
                               
                             ) : (
                               <li className="py-1 pl-4">No items available</li>

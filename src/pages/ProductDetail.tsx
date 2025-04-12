@@ -24,7 +24,9 @@ const ProductDetail = () => {
 
     const user = await authApi.getCurrentUser(token);
     console.log(user);
-    await cartApi.addToCart(user.id,product.id1,1,product.price);
+    
+  
+    await cartApi.addToCart(user.id,product.id1,1,product.price,product.name );  
     // setIsAdding(true);
     // await addToCart(product);
     // setIsAdding(false);
@@ -32,7 +34,7 @@ const ProductDetail = () => {
   useEffect(() => {
       const fetchCartItems = async () => {
         try {
-          const items = await productApi.getById(Number(id)); // Assuming this fetches products
+          const items = await productApi.getProductById(Number(id)); // Assuming this fetches products
           setProduct(items);
         } catch (error) {
           console.error('Failed to fetch cart items:', error);
@@ -80,7 +82,7 @@ const ProductDetail = () => {
           
           {user ? (
             <div className="text-2xl font-bold text-primary">
-              ${product.price.toFixed(2)}
+              ${product.price}
             </div>
           ) : (
             <div className="text-muted-foreground italic">

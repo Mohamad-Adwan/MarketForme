@@ -13,18 +13,30 @@ import {
 } from '@/components/ui/select';
 import { Product } from '@/types';
 import { Search, Filter } from 'lucide-react';
+import { productApi } from '@/services/apiService';
 
 const ProductsPage = () => {
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  
+    const [Items, setItems] = useState<Product[]>([]);
+    useEffect(() => {
+      const fetchItems = async () => {
+        try {
+          const items = await productApi.getAll(); // Assuming this fetches products
+          setItems(items);
+        } catch (error) {
+          console.error('Failed to fetch cart items:', error);
+        }
+      };
+      fetchItems();
+    }, []);
   // Extract unique categories
-  const categories = ['all', ...new Set(products.map(product => product.category))];
-  
+  const categories = ['all', ...new Set(Items.map(product => product.category))];
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(Items);
+
   // Apply filters
   useEffect(() => {
-    let result = [...products];
+    let result = [...Items];
     
     // Apply search filter
     if (searchQuery) {
@@ -82,13 +94,18 @@ const ProductsPage = () => {
       </div>
       
       {/* Products Grid */}
-      {filteredProducts.length === 0 ? (
+      {filteredProducts.length === 0 ?(searchQuery.length ===0 ?(
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Items.map((product) => (
+            <ProductCard key={product.id1} product={product} />
+          ))}
+        </div>): (
         <div className="text-center py-12">
           <p className="text-lg text-muted-foreground">
             No products match your search criteria.
           </p>
         </div>
-      ) : (
+      ) ): (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
             <ProductCard key={product.id1} product={product} />

@@ -171,7 +171,11 @@ const orderSchema = new mongoose.Schema({
       id1: { type: Number, required: true },  // productId
       quantity: { type: Number, required: true },
       price: { type: Number, required: true },
-      image: { type: String, required: true },
+      image: {
+        data: Buffer, // use Buffer if you're storing raw binary data
+        contentType: String,
+        FileName: String
+      },
       itemname: { type: String, required: true },
     }
   ],
