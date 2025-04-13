@@ -76,9 +76,28 @@ useEffect(() => {
 
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (registerPassword !== confirmPassword) {
       toast.error('Passwords do not match');
+      return;
+    }
+    if (registerPassword.length < 8) {
+      toast.error('Password must be at least 8 characters long.');
+      return;
+    }
+    if (!/[a-z]/.test(registerPassword)) {
+      toast.error('Password must include at least one lowercase letter.');
+      return;
+    }
+    if (!/[A-Z]/.test(registerPassword)) {
+      toast.error('Password must include at least one uppercase letter.');
+      return;
+    }
+    if (!/\d/.test(registerPassword)) {
+      toast.error('Password must include at least one number.');
+      return;
+    }
+    if (!/[@$!%*?&]/.test(registerPassword)) {
+      toast.error('Password must include at least one special character (e.g., @$!%*?&).');
       return;
     }
     
@@ -95,11 +114,17 @@ useEffect(() => {
       setCurrentView('emailVerification');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Registration failed';
-      toast.error(errorMessage);
+      //toast.error(errorMessage);
       console.error('Registration error:', error);
-      if (errorMessage.includes('already exists')) {
+      if(errorMessage.includes('email not Verified')){
         setVerificationEmail(registerEmail);
-       setCurrentView('emailVerification')
+        setCurrentView('emailVerification')
+        toast.error("Email need Verification");
+
+        // toast.error(errorMessage);
+      }
+      if (errorMessage.includes('already exists')) {
+        toast.info("You Can Login Email Registered And Verifieded")
       }
     } finally {
       setIsLoading(false);

@@ -168,11 +168,10 @@ const {Product} = require('../models/productModel'); // Assuming you have a Prod
 const orderController = {
   // Get all orders for a specific user
   getOrders: async (req, res) => {
-    const  userId  = req.params.id; // id here is the userId
+    const  userId  = req.params.userId; // id here is the userId
   
     try {
-      const orders = await Order.find({ nuser_Id:userId});
-  
+      const orders = await Order.find({ userId:userId});
       if (!orders || orders.length === 0) {
         return res.status(404).json({ message: 'No orders found for this user' });
       }

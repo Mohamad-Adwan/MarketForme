@@ -34,7 +34,26 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
       toast.error('Passwords do not match');
       return;
     }
-    
+    if (newPassword.length < 8) {
+          toast.error('Password must be at least 8 characters long.');
+          return;
+        }
+        if (!/[a-z]/.test(newPassword)) {
+          toast.error('Password must include at least one lowercase letter.');
+          return;
+        }
+        if (!/[A-Z]/.test(newPassword)) {
+          toast.error('Password must include at least one uppercase letter.');
+          return;
+        }
+        if (!/\d/.test(newPassword)) {
+          toast.error('Password must include at least one number.');
+          return;
+        }
+        if (!/[@$!%*?&]/.test(newPassword)) {
+          toast.error('Password must include at least one special character (e.g., @$!%*?&).');
+          return;
+        }
     setIsSubmitting(true);
     
     try {

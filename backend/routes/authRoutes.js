@@ -2,9 +2,24 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
-
+const rateLimit = require('express-rate-limit');
+// const loginLimiter = rateLimit({
+//     windowMs: 5 * 60 * 1000, // 5 minutes
+//     max: 10, // Limit each IP to 10 login attempts per windowMs
+//     handler: (req, res) => {
+//       // Calculate the remaining time in seconds
+//       const retryAfter = req.rateLimit.resetTime
+//         ? Math.ceil((req.rateLimit.resetTime.getTime() - Date.now()) / 1000)
+//         : 'a few seconds';
+  
+//       res.status(429).json({
+//         error: 'Too many login attempts. Please try again later.',
+//         retryAfter: retryAfter > 0 ? `${retryAfter} seconds` : 'a few seconds',
+//       });
+//     },
+//   });
 // Login
-router.post('/login', authController.login);
+router.post('/login'/*,loginLimiter*/, authController.login);
 
 // Register
 router.post('/register', authController.register);

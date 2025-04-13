@@ -78,51 +78,20 @@ const OrdersPage = () => {
   //   }
   // }, [user]);
   const token =localStorage.getItem("authToken")
-  const { data: orders, isLoading, error, refetch } = useQuery({
-    queryKey: ['orders', user.id],
-    queryFn: () => user ? orderApi.getOrders(token,user.id) : Promise.resolve([]),
-    enabled: !!user && !useMockData,
-    meta: {
-      onError: (err: Error) => {
-        console.error('Error fetching orders:', err);
-        toast.error(err.message || 'Failed to load orders');
-      }
-    },
+  const { data: orders = [], isLoading, error, refetch } = useQuery({
+    queryKey: ['orders', user?.id],
+    queryFn: () => orderApi.getOrders(token, user.id),
+    enabled: !!user,
     retry: 1,
+    
   });
   
-  // Check if we should use mock data after the query fails
-  useEffect(() => {
-    if (error && !useMockData) {
-      setUseMockData(true);
-      toast.info('Using sample order data since the API is unavailable');
-    }
-  }, [error, useMockData]);
   
-  // Combine API orders, pending orders, and mock data
+  // Check if we should use mock data after the query fails
   const getDisplayOrders = () => {
-    if (useMockData && user) {
-      // Return mock orders with current user info
-      // return [...mockOrders.map(order => ({
-      //   ...order,
-      //   userId: user.id,
-      //   userName: user.name
-      // })), ...pendingOrders];
-    } else if (orders && pendingOrders.length > 0) {
-      // Return API orders + pending orders
-      console.log('API orders:', orders);
-      console.log('Pending orders:', pendingOrders);
-      return [...orders, ...pendingOrders];
-    } else if (orders) {
-      // Just API orders
-      console.log('API orders:', orders);
-
+     if (orders.length) {
       return orders;
-    } else if (pendingOrders.length > 0) {
-      // Just pending orders
-      console.log('Pending orders:', pendingOrders);
-      return pendingOrders;
-    }
+    } 
     return [];
   };
   
@@ -180,42 +149,7 @@ const OrdersPage = () => {
     );
   }
   
-  if (error && !useMockData && pendingOrders.length === 0) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Error Loading Orders</CardTitle>
-            <CardDescription>There was a problem loading your orders. Please try again later.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Alert variant="destructive">
-              <AlertTitle>Connection Error</AlertTitle>
-              <AlertDescription>
-                We couldn't connect to our servers. This could be due to network issues or server maintenance.
-              </AlertDescription>
-            </Alert>
-            
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <Button 
-                onClick={() => refetch()} 
-                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
-              >
-                Try Again
-              </Button>
-              
-              <Button 
-                onClick={() => setUseMockData(true)}
-                variant="outline"
-              >
-                View Sample Orders
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+ 
   
   return (
     <div className="container mx-auto px-4 py-8">
@@ -226,12 +160,7 @@ const OrdersPage = () => {
               <CardTitle>My Orders</CardTitle>
               <CardDescription>View your order history and track your purchases</CardDescription>
             </div>
-            {useMockData && (
-              <Badge className="bg-yellow-100 text-yellow-800">Sample Data</Badge>
-            )}
-            {pendingOrders.length > 0 && (
-              <Badge className="bg-blue-100 text-blue-800">Includes Pending Orders</Badge>
-            )}
+            
           </div>
         </CardHeader>
         <CardContent>

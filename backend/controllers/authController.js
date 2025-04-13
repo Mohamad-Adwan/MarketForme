@@ -300,6 +300,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const sendEmail = require('../mailer'); // Import the mailer utility
 const { NumberVerification } = require("../twilio");
+const bcrypt = require('bcrypt');
 // Generate JWT token
 const generateToken = (user) => {
   return jwt.sign(
@@ -326,7 +327,11 @@ const authController = {
       }
       
       const isPasswordValid = await user.comparePassword(password);
-      
+      // const isPasswordValid = await bcrypt.compare(password, user.password);
+      // console.log(password)
+      // console.log(user.password)
+      // console.log(isPasswordValid)
+
       if (!isPasswordValid) {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
@@ -359,11 +364,15 @@ const authController = {
       
       const existingUser = await User.findOne({ email });
       
-      if (existingUser) {
+      if (existingUser ) {
+        if(!existingUser.emailVerified)
+          {
+            return res.status(409).json({ error: 'User email not Verified' });
+        }
         return res.status(409).json({ error: 'User already exists' });
       }
       //const generateVerificationCode = () => Math.floor(100000 + Math.random() * 900000); // Random 6-digit code
-
+      // const hashedPassword = await bcrypt.hash(password, 10);
       const verificationCode = crypto.randomBytes(3).toString('hex');
       const subject = 'Verify Your Email Address';
       const text = `Your verification code is: ${verificationCode}`;
@@ -449,7 +458,8 @@ const authController = {
       if (user.resetCode !== code) {
         return res.status(400).json({ error: 'Invalid reset code' });
       }
-      
+      // const hashedPassword = await bcrypt.hash(newPassword, 10);
+
       user.password = newPassword;
       user.resetCode = null;
       await user.save();
