@@ -156,7 +156,6 @@ const userSchema = new mongoose.Schema({
   phoneVerified: {
     type: Boolean,
     default: false, // Defaults to false until verified
-    unique: true,
   },
   resetCode: {
     type: String,
