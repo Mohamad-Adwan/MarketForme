@@ -15,9 +15,13 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import { authApi } from '@/services/apiService';
+import { LuEye } from "react-icons/lu";
+import { LuEyeClosed } from "react-icons/lu";
+
 import ForgotPasswordForm from './ForgotPasswordForm';
 import ResetPasswordForm from './ResetPasswordForm';
 import EmailVerificationForm from './EmailVerificationForm';
+import { EyeClosedIcon, EyeIcon } from 'lucide-react';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -45,7 +49,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   
   // Verification state
   const [verificationEmail, setVerificationEmail] = useState('');
-  
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRegisterPassword, setshowRegisterPassword] = useState(false);
+  const [showRegisterPasswordConfermid, setshowRegisterPasswordConfermid] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const { login, register } = useAuth();
   /////// here edit
@@ -237,16 +244,27 @@ useEffect(() => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input 
-                  id="password" 
-                  type="password" 
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)} 
-                  required
-                />
-              </div>
+      <Label htmlFor="password">Password</Label>
+      <div className="relative">
+        <Input 
+          id="password" 
+          type={showPassword ? 'text' : 'password'} 
+          placeholder="Enter your password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)} 
+          required
+          className="pr-10" // make space for the icon
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
+          tabIndex={-1}
+        >
+          {showPassword ? <EyeClosedIcon size={18} /> : <EyeIcon size={18} />}
+        </button>
+      </div>
+    </div>
               
               <div className="text-right">
                 <Button 
@@ -319,26 +337,51 @@ useEffect(() => {
               
               <div className="space-y-2">
                 <Label htmlFor="register-password">Password</Label>
+                <div className="relative">
                 <Input 
                   id="register-password" 
-                  type="password" 
+                  type={showRegisterPassword ? 'text' : 'password'}
                   placeholder="Create a password"
                   value={registerPassword}
                   onChange={(e) => setRegisterPassword(e.target.value)} 
                   required
+                  className="pr-10" // make space for the icon
                 />
+                <button
+                type="button"
+                onClick={() => setshowRegisterPassword(!showRegisterPassword)}
+                className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
+                tabIndex={-1}
+                >
+                {showRegisterPassword ? <EyeClosedIcon size={18} /> : <EyeIcon size={18} />}
+                </button>
+                </div>
+                
               </div>
-              
+               
               <div className="space-y-2">
                 <Label htmlFor="confirm-password">Confirm Password</Label>
+                <div className="relative">
                 <Input 
                   id="confirm-password" 
-                  type="password" 
+                  type={showRegisterPasswordConfermid ? 'text' : 'password'}
                   placeholder="Confirm your password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)} 
                   required
+                  className="pr-10" // make space for the icon
+
                 />
+                <button
+                type="button"
+                onClick={() => setshowRegisterPasswordConfermid(!showRegisterPasswordConfermid)}
+                className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
+                tabIndex={-1}
+ 
+                >
+               {showRegisterPasswordConfermid ? <EyeClosedIcon size={18} /> : <EyeIcon size={18} />}
+                </button>
+                </div>
               </div>
               
               <DialogFooter>
