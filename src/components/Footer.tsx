@@ -65,20 +65,20 @@ const Footer = () => {
             <h3 className="text-lg font-bold mb-4">Contact Info</h3>
             <ul className="space-y-2">
               <li className="text-muted-foreground text-sm">
-                Email: info@shopease.com
+                Email: info@techshop.com
               </li>
               <li className="text-muted-foreground text-sm">
-                Phone: (123) 456-7890
+                Phone: (+970) 595-642-327
               </li>
               <li className="text-muted-foreground text-sm">
-                Address: 123 Commerce St, City, Country
+                Address: Tulkrem, Palestine
               </li>
             </ul>
           </div>
         </div>
         
         <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} ShopEase. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Tech-Shop. All rights reserved.</p>
         </div>
       </div>
     </footer>

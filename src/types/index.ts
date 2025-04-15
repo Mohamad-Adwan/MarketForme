@@ -9,6 +9,7 @@ export interface Product {
   category: string;
   featured?: boolean;
   stock: number;
+  discountprice:number;
 }
 
 export interface User {

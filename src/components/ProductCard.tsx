@@ -50,9 +50,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <Card className="overflow-hidden h-full transition-all duration-200 hover:shadow-md flex flex-col">
       <div className="relative h-48 overflow-hidden">
-        {product.featured && (
+        {/* {product.featured && (
           <Badge className="absolute top-2 left-2 z-10">Featured</Badge>
-        )}
+        )} */}
         <img 
           src={product.image} 
           alt={product.name} 
@@ -69,10 +69,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       
       <CardFooter className="flex flex-col items-stretch gap-2 mt-auto">
         <div className="flex justify-between items-center w-full">
-          {isOnoff ? (
-            <span className="font-bold">${product.price.toFixed(2)}</span>
+        {isOnoff ? (
+            product.discountprice > 0 ? (
+              <div>
+               <div className="text-xl text-muted-foreground italic line-through">
+               {product.price}₪
+                  </div>
+                <div className="text-2xl font-bold text-primary">
+                  {product.discountprice}₪
+                </div>
+              </div>
+            ) : (
+              <div className="text-muted-foreground italic">
+                {product.price}₪
+              </div>
+            )
           ) : (
-            <span className="text-muted-foreground italic"></span>
+            <div className="text-muted-foreground italic">
+            </div>
           )}
           <Badge variant="outline">{product.category}</Badge>
         </div>

@@ -123,6 +123,7 @@ const productSchema = new mongoose.Schema({
   id1: { type: Number,unique: true }, // Auto-increment field
   name: { type: String, required: true },
   price: { type: Number, required: true },
+  discountprice:{type:Number},
   description: String,
   stock: Number,
   category: String,

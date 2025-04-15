@@ -77,12 +77,12 @@ const ProductDetail = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Product Image */}
-        <div className="aspect-square overflow-hidden rounded-lg">
+        {/* <div className="aspect-square overflow-hidden rounded-lg"> */}
+        <div className=" overflow-hidden rounded-lg">
           <img 
             src={product.image} 
             alt={product.name} 
-            className="w-full h-full object-cover"
-          />
+            className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"          />
         </div>
         
         {/* Product Details */}
@@ -94,10 +94,22 @@ const ProductDetail = () => {
             </Badge>
           </div>
           
+
           {isOnoff ? (
-            <div className="text-2xl font-bold text-primary">
-              ${product.price}
-            </div>
+            product.discountprice > 0 ? (
+              <div>
+               <div className="text-xl text-muted-foreground italic line-through">
+               {product.price}₪
+                  </div>
+                <div className="text-2xl font-bold text-primary">
+                  {product.discountprice}₪
+                </div>
+              </div>
+            ) : (
+              <div className="text-muted-foreground italic">
+                {product.price}₪
+              </div>
+            )
           ) : (
             <div className="text-muted-foreground italic">
             </div>

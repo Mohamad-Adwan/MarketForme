@@ -134,7 +134,7 @@ export const useAdminData = () => {
   useEffect(() => {
     if ((ordersError || usersError) && !useMockData) {
       setUseMockData(true);
-      toast.info('Using sample data since the API is unavailable');
+      //toast.info('Using sample data since the API is unavailable');
     }
   }, [ordersError, usersError, useMockData]);
   

@@ -53,6 +53,7 @@
     "gridfs-stream": "^1.1.1",
     "input-otp": "^1.2.4",
     "jsonwebtoken": "^9.0.2",
+    "keen-slider": "^6.8.6",
     "lucide-react": "^0.462.0",
     "mongoose": "^8.13.2",
     "mongoose-sequence": "^6.0.1",

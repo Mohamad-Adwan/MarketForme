@@ -103,6 +103,8 @@ import ProductCard from '@/components/ProductCard';
 import { getFeaturedProducts } from '@/data/products';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { productApi } from '@/services/apiService';
+import { useKeenSlider } from 'keen-slider/react'
+import 'keen-slider/keen-slider.min.css'
 
 const HomePage = () => {
   const [cartItems, setCartItems] = useState<Product[]>([]);
@@ -116,6 +118,7 @@ const HomePage = () => {
     category: string;
     stock: number;
     featured?: boolean;
+    discountprice:number;
 
     
   };
@@ -132,7 +135,67 @@ const HomePage = () => {
     };
     fetchCartItems();
   }, []);
+ 
+ 
 
+  const discountedProducts = products.filter(
+    (product) => product.discountprice && product.discountprice > 0
+  );
+  
+  function AutoplayPlugin(slider) {
+    let timeout;
+    let mouseOver = false;
+  
+    function clearNextTimeout() {
+      clearTimeout(timeout);
+    }
+  
+    function nextTimeout() {
+      clearTimeout(timeout);
+      if (mouseOver) return;
+      timeout = setTimeout(() => {
+        slider.next();
+      }, 2500);
+    }
+  
+    slider.on("created", () => {
+      slider.container.addEventListener("mouseover", () => {
+        mouseOver = true;
+        clearNextTimeout();
+      });
+      slider.container.addEventListener("mouseout", () => {
+        mouseOver = false;
+        nextTimeout();
+      });
+      nextTimeout();
+    });
+  
+    slider.on("dragStarted", clearNextTimeout);
+    slider.on("animationEnded", nextTimeout);
+    slider.on("updated", nextTimeout);
+  }
+  const [sliderRef,slider] = useKeenSlider({
+    loop: true,
+    slides: {
+      perView: 3,
+      spacing: 15,
+    },
+    breakpoints: {
+      "(max-width: 768px)": {
+        slides: { perView: 1 },
+      },
+    },
+  }, [AutoplayPlugin]);
+  
+  useEffect(() => {
+      let interval
+      if (slider.current) {
+        interval = setInterval(() => {
+          slider.current?.next()
+        }, 3000) // Change every 3 seconds
+      }
+      return () => clearInterval(interval)
+    }, [slider])
   // Fetch 9 featured products
   useEffect(() => {
     const fetchProducts = async () => {
@@ -166,7 +229,6 @@ const HomePage = () => {
             </h1>
             <p className="text-lg text-muted-foreground mb-8">
               Discover our premium selection of products for all your needs.
-              Login to see prices and enjoy exclusive features.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -176,7 +238,26 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-      
+
+      {products.some(product => product.discountprice && product.discountprice > 0) && (
+  <div className="my-6">
+    <h2 className="text-xl font-bold mb-4">🔥 Discounted Products</h2>
+    <div ref={sliderRef} className="keen-slider">
+      {products
+        .filter(product => product.discountprice && product.discountprice > 0)
+        .map((product, index) => (
+          <div className="keen-slider__slide bg-white p-4 rounded-lg shadow" key={index}>
+            <div key={product.id1}>
+                <ProductCard product={product} />
+                
+              </div>
+          </div>
+        ))}
+    </div>
+  </div>
+)}
+
+
       {/* Featured Products */}
       <section className="py-16">
         <div className="container mx-auto px-4">
@@ -187,7 +268,7 @@ const HomePage = () => {
             </Link>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {products.map((product) => (
               <div key={product.id1}>
                 <ProductCard product={product} />

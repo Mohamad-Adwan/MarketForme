@@ -59,30 +59,13 @@ const AdminDashboard = () => {
     handleDeleteUser
   } = useAdminData();
   
-  if (!user || user.role !== 'admin') {
-    return <Navigate to="/" />;
-  }
-  
-  const ApiErrorBanner = () => {
-    if (!useMockData) return null;
-    
-    return (
-      <Alert variant="destructive">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertTitle>API Connection Issue</AlertTitle>
-        <AlertDescription>
-          We couldn't connect to the backend API. You are currently viewing sample data.
-        </AlertDescription>
-      </Alert>
-    );
-  };
   
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
       <p className="text-muted-foreground mb-4">Manage your store</p>
       
-      <ApiErrorBanner />
+      
       
       <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-4 mb-8">

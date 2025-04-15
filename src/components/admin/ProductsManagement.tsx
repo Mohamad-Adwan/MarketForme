@@ -736,6 +736,7 @@ const ProductsManagement: React.FC<ProductsManagementProps> = ({
       image: ' ',
       category: '',
       stock: 0,
+      discountprice:0,
       
     };
 
@@ -866,6 +867,7 @@ const ProductsManagement: React.FC<ProductsManagementProps> = ({
               <TableHead>Name</TableHead>
               <TableHead>Description</TableHead>
               <TableHead>Price</TableHead>
+              <TableHead>Discount price</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Stock</TableHead>
               <TableHead>Image</TableHead>
@@ -878,7 +880,8 @@ const ProductsManagement: React.FC<ProductsManagementProps> = ({
                 <TableCell>{product.id1}</TableCell>
                 <TableCell>{product.name}</TableCell>
                 <TableCell>{product.description}</TableCell>
-                <TableCell>${product.price}</TableCell>
+                <TableCell>{product.price}₪</TableCell>
+                <TableCell>{product.discountprice}₪</TableCell>
                 <TableCell>{product.category}</TableCell>
                 <TableCell>{product.stock}</TableCell>
                 
@@ -972,6 +975,18 @@ const ProductsManagement: React.FC<ProductsManagementProps> = ({
                   value={editingProduct.price}
                   onChange={handleChange}
                   placeholder="Price"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">
+                Discount price
+                </label>
+                <Input
+                  name="discountprice"
+                  type="number"
+                  value={editingProduct.discountprice}
+                  onChange={handleChange}
+                  placeholder="Discount Price"
                 />
               </div>
               <div>
