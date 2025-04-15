@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import { useCart } from '@/context/CartContext';
 import { Product } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/context/AuthContext';
-import { authApi, cartApi } from '@/services/apiService';
+import { authApi, cartApi, globalApi } from '@/services/apiService';
 
 interface ProductCardProps {
   product: Product;
@@ -18,6 +18,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addToCart } = useCart();
   const { user } = useAuth();
   const [isAdding, setIsAdding] = useState(false);
+  const [isOnoff, setisOnOff] = useState(false);
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const response = await globalApi.getStatus();
+        // Assuming response = { showPrice: true/false }
+        setisOnOff(response.showPrice || false);
+      } catch (error) {
+        console.error("Failed to fetch status:", error);
+      }
+    };
+
+    fetchStatus();
+  }, []);
   
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -55,10 +69,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       
       <CardFooter className="flex flex-col items-stretch gap-2 mt-auto">
         <div className="flex justify-between items-center w-full">
-          {user ? (
+          {isOnoff ? (
             <span className="font-bold">${product.price.toFixed(2)}</span>
           ) : (
-            <span className="text-muted-foreground italic">Login to see price</span>
+            <span className="text-muted-foreground italic"></span>
           )}
           <Badge variant="outline">{product.category}</Badge>
         </div>

@@ -275,3 +275,17 @@ export const orderApi = {
       }),
 
 };
+export const globalApi=
+{
+
+getStatus:()=>apiRequest('global/getpriceState'),
+
+setStatus:(status:boolean)=>apiRequest('global/putpriceState',
+  {
+    method: 'PUT',
+    body: JSON.stringify({ status }),
+  }
+)
+
+
+};

@@ -654,7 +654,7 @@ import React, { useEffect, useState } from 'react';
 import { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { productApi } from '@/services/apiService'; // Your API module
+import { globalApi, productApi } from '@/services/apiService'; // Your API module
 import { toast } from 'sonner';
 
 import {
@@ -693,7 +693,31 @@ const ProductsManagement: React.FC<ProductsManagementProps> = ({
  // const [product, setProducts] = useState<Product[]>([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [product, setProducts] = useState([]);
+  const [isOnoff, setisOnOff] = useState(false);
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const response = await globalApi.getStatus();
+        // Assuming response = { showPrice: true/false }
+        setisOnOff(response.showPrice || false);
+      } catch (error) {
+        console.error("Failed to fetch status:", error);
+      }
+    };
 
+    fetchStatus();
+  }, []);
+
+  const toggle = async () => {
+    const newStatus = !isOnoff;
+    setisOnOff(newStatus);
+
+    try {
+      await globalApi.setStatus(newStatus);
+    } catch (error) {
+      console.error("Failed to update status:", error);
+    }
+  }
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -811,11 +835,29 @@ const ProductsManagement: React.FC<ProductsManagementProps> = ({
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Product Management</h2>
+        <div className="flex gap-3">
+        <div className="flex items-center gap-3">
+        <span className="text-lg font-semibold">Price Status</span>
+        <button
+          onClick={toggle}
+          className={`w-14 h-8 flex items-center rounded-full p-1 transition-all duration-300 ease-in-out
+            ${isOnoff ? 'bg-green-500' : 'bg-gray-300'}
+            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer active:scale-95`}
+        >
+          <div
+            className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ${
+              isOnoff ? 'translate-x-6' : 'translate-x-0'
+            }`}
+          />
+        </button>
+      </div>
         <Button onClick={handleAddProduct}>
           <Plus className="w-4 h-4 mr-2" />
           Add Product
         </Button>
-      </div>
+             
+              </div>
+              </div>
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <Table>
           <TableHeader>

@@ -1,6 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { Product, Order, Stats } from '@/types';
+import { Package, Users, DollarSign, Truck, Clock, PackageCheck, PackageX,Send,Loader } from "lucide-react";
+
 import {
   Table,
   TableBody,
@@ -83,46 +85,104 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   return (
     <div className="space-y-8">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+
       <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-muted-foreground mb-1 text-sm">Products</h3>
-          <p className="text-3xl font-bold">{localStats.totalProducts?0:localStats.totalProducts}</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-muted-foreground mb-1 text-sm">Products</h3>
+            <p className="text-3xl font-bold">{!localStats.totalProducts ? 0 : localStats.totalProducts}</p>
+          </div>
+          <Package className="w-6 h-6 text-gray-400" />
         </div>
+      </div>
+
         <div className="bg-white p-6 rounded-lg shadow">
+        <div className="flex items-center justify-between">
+        <div>
           <h3 className="text-muted-foreground mb-1 text-sm">Total Users</h3>
           <p className="text-3xl font-bold">{localStats.totalUsers?0:localStats.totalUsers}</p>
+          </div>
+          <Users className="w-6 h-6 text-gray-400" />
+          </div>
         </div>
+
+
         <div className="bg-white p-6 rounded-lg shadow">
+        <div className="flex items-center justify-between">
+        <div>
           <h3 className="text-muted-foreground mb-1 text-sm">Total Sales</h3>
           <p className="text-3xl font-bold">${!localStats.totalSales?0:localStats.totalSales}</p>
+          </div>
+          <DollarSign className="w-6 h-6 text-gray-400" />
+            </div>
         </div>
+
+
+
+
         <div className="bg-white p-6 rounded-lg shadow">
+        <div className="flex items-center justify-between">
+        <div>
           <h3 className="text-muted-foreground mb-1 text-sm">Total Orders</h3>
           <p className="text-3xl font-bold">{!localStats.totalOrders?0:localStats.totalOrders}</p>
+          </div>
+          <Truck className="w-6 h-6 text-gray-400" />
         </div>
+        </div>
+
         <div className="bg-white p-6 rounded-lg shadow">
+        <div className="flex items-center justify-between">
+        <div>
           <h3 className="text-muted-foreground mb-1 text-sm">Total Pending Orders</h3>
           <p className="text-3xl font-bold">{!localStats.pendingOrders?0:localStats.shippedOrders}</p>
+          </div>
+          <Clock className="w-6 h-6 text-gray-400" />
         </div>
+        </div>
+
         <div className="bg-white p-6 rounded-lg shadow">
+        <div className="flex items-center justify-between">
+        <div>
           <h3 className="text-muted-foreground mb-1 text-sm">Total Processing Orders</h3>
           <p className="text-3xl font-bold">{!localStats.processingOrders?0:localStats.processingOrders}</p>
+          </div>
+          <Loader className="w-6 h-6 text-gray-400" />
         </div>
+        </div>
+
+
         <div className="bg-white p-6 rounded-lg shadow">
+        <div className="flex items-center justify-between">
+        <div>
           <h3 className="text-muted-foreground mb-1 text-sm">Total Shipped Orders</h3>
           <p className="text-3xl font-bold">{!localStats.shippedOrders?0:localStats.shippedOrders}</p>
+          </div>
+          <Send className="w-6 h-6 text-gray-400" />
         </div>
+        </div>
+
+
         <div className="bg-white p-6 rounded-lg shadow">
+        <div className="flex items-center justify-between">
+        <div>
           <h3 className="text-muted-foreground mb-1 text-sm">Total Delivered Orders</h3>
           <p className="text-3xl font-bold">{!localStats.deliveredOrders ? 0 :localStats.deliveredOrders }</p>
+          </div>
+          <PackageCheck className="w-6 h-6 text-gray-400" />
         </div>
+        </div>
+
+        
         <div className="bg-white p-6 rounded-lg shadow">
+        <div className="flex items-center justify-between">
+        <div>
           <h3 className="text-muted-foreground mb-1 text-sm">Total Cancelled Orders</h3>
           <p className="text-3xl font-bold">{!localStats.canceledOrders? 0:localStats.canceledOrders}</p>
         </div>
-       
-       
-       
-      </div>
+        <PackageX className="w-6 h-6 text-gray-400" />
+        </div>
+        </div>
+        </div>
       
       
       <div className="bg-white p-6 rounded-lg shadow w-full max-w-7xl h-[650px]">

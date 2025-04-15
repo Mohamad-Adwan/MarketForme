@@ -576,6 +576,7 @@ const fullProductDetails = await Product.find({ id1: { $in: topProductIds } });
           total: order.total,
           status: order.status,
           date: order.date,
+          phone:order.phone,
           items: updatedItems
         };
       });

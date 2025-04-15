@@ -7,7 +7,7 @@ import { getProductById } from '@/data/products';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { Badge } from '@/components/ui/badge';
-import { authApi, cartApi, productApi } from '@/services/apiService';
+import { authApi, cartApi, globalApi, productApi } from '@/services/apiService';
 import { Product } from '@/types';
 
 const ProductDetail = () => {
@@ -17,6 +17,20 @@ const ProductDetail = () => {
   const { user } = useAuth();
   const [isAdding, setIsAdding] = useState(false);
   const [product, setProduct] = useState<Product | null>(null);
+  const [isOnoff, setisOnOff] = useState(false);
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const response = await globalApi.getStatus();
+        // Assuming response = { showPrice: true/false }
+        setisOnOff(response.showPrice || false);
+      } catch (error) {
+        console.error("Failed to fetch status:", error);
+      }
+    };
+
+    fetchStatus();
+  }, []);
   const handleAddToCart = async () => {
     if (!product) return;
     const token = localStorage.getItem('authToken');
@@ -80,13 +94,12 @@ const ProductDetail = () => {
             </Badge>
           </div>
           
-          {user ? (
+          {isOnoff ? (
             <div className="text-2xl font-bold text-primary">
               ${product.price}
             </div>
           ) : (
             <div className="text-muted-foreground italic">
-              Login to see price
             </div>
           )}
           

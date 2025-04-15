@@ -15,9 +15,6 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import { authApi } from '@/services/apiService';
-import { LuEye } from "react-icons/lu";
-import { LuEyeClosed } from "react-icons/lu";
-
 import ForgotPasswordForm from './ForgotPasswordForm';
 import ResetPasswordForm from './ResetPasswordForm';
 import EmailVerificationForm from './EmailVerificationForm';
