@@ -40,9 +40,13 @@ const Navbar = () => {
     <nav className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3">
         <div className="flex justify-between items-center">
-          {/* Logo */}
-          <Link to="/" className="text-2xl font-bold text-primary">
-            Tech-Shop
+          <Link to="/" className="text-2xl font-bold text-pri
+          mary">
+          <div className="flex items-center gap-2">
+          <img src="../../src/images/logo.png" alt="Logo" width={32} height={32} />
+          <span className="text-2xl font-bold text-primary">Tech-Shop</span>
+          </div>
+
           </Link>
 
           {/* Mobile Menu Toggle */}
@@ -54,7 +58,7 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           {!isMobile && (
-            <div className="hidden lg:flex items-center space-x-8">
+            <div className="hidden md:flex items-center space-x-8">
               <Link to="/" className="font-medium hover:text-primary">
                 Home
               </Link>

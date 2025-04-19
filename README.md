@@ -18,6 +18,7 @@ CREATE TABLE products (
   category VARCHAR(100),
   featured BOOLEAN DEFAULT FALSE,
   stock INT NOT NULL DEFAULT 0
+  
 );
 ```
 

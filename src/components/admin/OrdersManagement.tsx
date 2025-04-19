@@ -227,7 +227,7 @@ import React, { useState, useEffect } from 'react';
 import { DateRangeFilter, Order } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { orderApi } from '@/services/apiService';
+import { globalApi, orderApi } from '@/services/apiService';
 import { Input } from '@/components/ui/input';
 import { Calendar } from '@/components/ui/calendar';
 import { format, isAfter, isBefore, isValid, parseISO } from 'date-fns';
@@ -252,6 +252,8 @@ import {
   ChevronRight,
   User
 } from 'lucide-react';
+import { faFilePdf } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -447,6 +449,10 @@ const OrdersManagement: React.FC = () => {
     }
     return 'Select date range';
   };
+  const saveOrderAsPDF = async (orderId:number) => {
+    await globalApi.printPDF(orderId);
+    toast.success('PDF generated successfully');
+  }
   return (
     <>
       <div className="flex justify-between items-center mb-6">
@@ -633,6 +639,11 @@ const OrdersManagement: React.FC = () => {
                 <Pencil className="h-4 w-4 mr-2" />
                 Status
               </Button>
+              <Button  size="sm"
+                              variant="outline"
+                              onClick={() => saveOrderAsPDF(order.id2)}
+                              
+                               ><FontAwesomeIcon icon={faFilePdf} />Save</Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="ghost" size="sm" className="text-red-500 hover:text-white hover:bg-red-500">
@@ -907,6 +918,11 @@ const OrdersManagement: React.FC = () => {
                 <Pencil className="h-4 w-4 mr-2" />
                 Status
               </Button>
+              <Button  size="sm"
+                              variant="outline"
+                              onClick={() => saveOrderAsPDF(order.id2)}
+                              
+                               ><FontAwesomeIcon icon={faFilePdf} />Save</Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="ghost" size="sm" className="text-red-500 hover:text-white hover:bg-red-500">
@@ -1197,8 +1213,15 @@ const OrdersManagement: React.FC = () => {
                             >
                               {expandedOrders.has(order.id2) ? 'Hide Items' : 'Show Items'}
                             </Button>
+                            <Button  size="sm"
+                              variant="outline"
+                              onClick={() => saveOrderAsPDF(order.id2)}
+                              
+                               ><FontAwesomeIcon icon={faFilePdf} />Save</Button>
                           </div>
+                          
                         )}
+                         
                       </TableCell>
                     </TableRow>
 
@@ -1458,6 +1481,11 @@ const OrdersManagement: React.FC = () => {
                             >
                               {expandedOrders.has(order.id2) ? 'Hide Items' : 'Show Items'}
                             </Button>
+                            <Button  size="sm"
+                              variant="outline"
+                              onClick={() => saveOrderAsPDF(order.id2)}
+                              
+                               ><FontAwesomeIcon icon={faFilePdf} />Save</Button>
                           </div>
                         )}
                       </TableCell>

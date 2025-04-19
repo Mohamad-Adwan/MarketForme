@@ -216,20 +216,22 @@ const orderController = {
     try {
       // Fetch only orders with status 'delivered'
       const orders = await Order.find({ status: 'delivered' });
-      console.log('orders:', orders);
+      const allorder = await Order.find();
+
+      //console.log('orders:', allorder);
   
-      const totalOrders = orders.length;
+      const totalOrders = allorder.length;
       const totalSales = orders.reduce((sum, order) => {
         if (order.status === 'delivered') { // Check if the order status is 'delivered'
           return sum + order.total; // Add order total to the sum if it's delivered
         }
         return sum; // Otherwise, don't add the order total
       }, 0);
-      const pendingOrders = orders.filter(order => order.status === 'pending').length;
-      const canceledOrders = orders.filter(order => order.status === 'cancelled').length;
-      const deliveredOrders = orders.filter(order => order.status === 'delivered').length;
-      const shippedOrders = orders.filter(order => order.status === 'shipped').length;
-      const processingOrders = orders.filter(order => order.status === 'processing').length;
+      const pendingOrders = allorder.filter(order => order.status === 'pending').length;
+      const canceledOrders = allorder.filter(order => order.status === 'cancelled').length;
+      const deliveredOrders = allorder.filter(order => order.status === 'delivered').length;
+      const shippedOrders = allorder.filter(order => order.status === 'shipped').length;
+      const processingOrders = allorder.filter(order => order.status === 'processing').length;
       console.log('pendingOrders:', pendingOrders);
       console.log('canceledOrders:', canceledOrders);
       console.log('deliveredOrders:', deliveredOrders);

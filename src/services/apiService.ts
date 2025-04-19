@@ -3,13 +3,16 @@ import { Product, User, Order } from '../types';
 
 // Define the type for request options
 interface RequestOptions extends RequestInit {
+  method?: string;
   headers?: Record<string, string>;
-  body?: string;
+  body?: string | FormData;
+  responseType?: 'json' | 'blob'; // Add this line to handle different response types
+
 }
 export interface RequestOptionsdata {
   method?: string;
   headers?: Record<string, string>;
-  body?: string | FormData; // 👈 allow both JSON and FormData
+  body?: string | FormData; //  allow both JSON and FormData
 }
 
 // Base API request function
@@ -18,6 +21,8 @@ const apiRequest = async (endpoint: string, options: RequestOptions = {}) => {
   
   try {
     console.log(`Making API request to: ${url}`, { options });
+    
+    // Make the request with fetch
     const response = await fetch(url, {
       ...options,
       headers: {
@@ -31,6 +36,12 @@ const apiRequest = async (endpoint: string, options: RequestOptions = {}) => {
       throw new Error(errorData.message || errorData.error || `API error: ${response.status}`);
     }
 
+    // Check if the response is expected to be a binary file (blob)
+    if (options.responseType === 'blob') {
+      return response.blob(); // Return the blob (binary data like a PDF)
+    }
+    
+    // For other requests, assume the response is JSON
     const data = await response.json();
     console.log(`API response from ${url}:`, data);
     return data;
@@ -39,6 +50,7 @@ const apiRequest = async (endpoint: string, options: RequestOptions = {}) => {
     throw error;
   }
 };
+
 function isFormData(value: any): value is FormData {
   return typeof value === 'object' && value instanceof FormData;
 }
@@ -285,7 +297,26 @@ setStatus:(status:boolean)=>apiRequest('global/putpriceState',
     method: 'PUT',
     body: JSON.stringify({ status }),
   }
-)
+),
+printPDF: (orderId: number) => {
+  return apiRequest('global/printPDF', {
+    method: 'GET', // Use GET since we are fetching a file
+    params: { orderId }, // Send the orderId in the params
+    responseType: 'blob', // Make sure we handle the response as a blob (binary data)
+  })
+    .then((blob: Blob) => {
+      // Create a temporary URL for the PDF blob
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `order-${orderId}.pdf`; // Dynamically name the file with the orderId
+      a.click(); // Trigger the download
+      window.URL.revokeObjectURL(url); // Clean up the URL object
+    })
+    .catch((error) => {
+      console.error('Error during PDF download:', error);
+    });
+},
 
 
 };

@@ -134,7 +134,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
         <div className="flex items-center justify-between">
         <div>
           <h3 className="text-muted-foreground mb-1 text-sm">Total Pending Orders</h3>
-          <p className="text-3xl font-bold">{!localStats.pendingOrders?0:localStats.shippedOrders}</p>
+          <p className="text-3xl font-bold">{!localStats.pendingOrders?0:localStats.pendingOrders}</p>
           </div>
           <Clock className="w-6 h-6 text-gray-400" />
         </div>
