@@ -7,7 +7,7 @@ interface RequestOptions extends RequestInit {
   headers?: Record<string, string>;
   body?: string | FormData;
   responseType?: 'json' | 'blob'; // Add this line to handle different response types
-
+  params?: Record<string, any>;
 }
 export interface RequestOptionsdata {
   method?: string;
@@ -17,11 +17,14 @@ export interface RequestOptionsdata {
 
 // Base API request function
 const apiRequest = async (endpoint: string, options: RequestOptions = {}) => {
-  const url = `${dbConfig.apiUrl}/${endpoint}`;
+  let url = `${dbConfig.apiUrl}/${endpoint}`;
   
   try {
     console.log(`Making API request to: ${url}`, { options });
-    
+    if (options.params) {
+      const query = new URLSearchParams(options.params).toString();
+      url += `?${query}`;
+    }
     // Make the request with fetch
     const response = await fetch(url, {
       ...options,

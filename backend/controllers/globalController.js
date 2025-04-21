@@ -35,61 +35,106 @@ const globalController = {
     }
   },
   // In the backend controller
-printPDF: async (req, res) => {
-  const { orderId } = req.query;
-  const order = await Order.findOne({ id1: orderId });
+  printPDF : async (req, res) => {
+    const { orderId } = req.query;
 
-  // Create the PDF document
-  const doc = new PDFDocument({
-    size: 'A4',
-    layout: 'portrait',
-  });
-
-  // Pipe the PDF document directly to the response as a PDF download
-  res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', `attachment; filename="order-${order.id}.pdf"`);
-
-  doc.pipe(res); // Send PDF directly to the client as the response
-
-  // Title section (modern styling)
-  doc.fontSize(24).font('Helvetica-Bold').text('Tech-Shop', { align: 'center', underline: true });
-
-  doc.fontSize(20).font('Helvetica-Bold').text('Order Summary', { align: 'center', underline: true });
-  doc.moveDown(1); // Add space after the title
-
-  // Order information section with modern styling
-  doc.fontSize(14).font('Helvetica').text(`Order ID: ${order.id1}`, { align: 'left' });
-  doc.text(`Customer: ${order.username}`, { align: 'left' });
-  doc.text(`phone: ${order.phone}`, { align: 'left' });
-  doc.text(`Order Date: ${new Date(order.date).toLocaleDateString()}`, { align: 'left' });
-  doc.text(`Printed: ${new Date().toLocaleString()}`, { align: 'left' });
-  doc.moveDown(2); // Add space after order info
-
-  // Items list section with better layout
-  doc.fontSize(16).font('Helvetica-Bold').text('Items:', { underline: true });
-  doc.moveDown(0.5); // Add space after title
-
-  // Table-like layout for the items
-  order.items.forEach((item, index) => {
-    doc.fontSize(12).font('Helvetica').text(
-      `${index + 1}. ${item.itemname}`,
-      { continued: true }
+  
+    const order = await Order.findOne({ id2: orderId }); // Replace with your actual DB call
+    if (!order) return res.status(404).send('Order not found');
+  
+    const doc = new PDFDocument({ margin: 50 });
+  
+    // Pipe to HTTP response
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=invoice-${orderId}.pdf`);
+    doc.pipe(res);
+  
+    // Company Info
+    doc.fontSize(18).font('Helvetica-Bold').text('Tech-Shop', { align: 'center' });
+    doc.fontSize(12).font('Helvetica').text('Tulkarm, West Bank', { align: 'left' });
+    doc.text('Phone: (970) 595-642-327', { align: 'left' });
+    doc.text('Email: support@Tech-Shop.com', { align: 'left' });
+  
+    doc.moveDown(2);
+  
+    // Title
+    doc.fontSize(24).font('Helvetica-Bold').text('Invoice', { align: 'center' });
+    doc.moveDown(1);
+  
+    // Invoice Details
+    const dueDate = new Date(order.date).toLocaleDateString('en-GB');
+    const today = new Date().toLocaleDateString('en-GB');
+  
+    doc.fontSize(12).font('Helvetica')
+      .text(`Invoice #${orderId}`, 405, doc.y, { align: 'left' })
+      .text(`Date: ${today}`, 405, doc.y + 10, { align: 'left' })
+      .text(`Due Date: ${dueDate}`, 405, doc.y + 15, { align: 'left' })
+      .text(`Customer: ${order.userName}`, 405, doc.y + 20, { align: 'left' })
+      .text(`Customer Number: ${order.phone}`, 405, doc.y + 25, { align: 'left' });
+  
+    doc.moveDown(4);
+  
+    // Table Header
+    doc.fontSize(12).font('Helvetica-Bold');
+    doc.text('Item Name', 50, doc.y);
+    doc.text('Qty', 320, doc.y-20, { align: 'center' });
+    doc.text('Price', 400, doc.y-15, { align: 'right' });
+  
+    // Header line
+    doc.moveTo(50, doc.y + 15).lineTo(550, doc.y + 15).strokeColor('#000').stroke();
+  
+    // Items
+    doc.font('Helvetica').fontSize(12);
+    let yPos = doc.y + 25;
+  
+    order.items.forEach((item) => {
+      doc.text(item.itemname, 50, yPos);
+      doc.text(item.quantity.toString(), 320, yPos, { align: 'center' });
+      doc.text(`$${item.price.toFixed(2)}`, 400, yPos, { align: 'right' });
+      yPos += 20;
+    });
+  
+    // Divider
+    doc.moveTo(50, yPos).lineTo(550, yPos).stroke();
+  
+    // Totals
+    const tax = 0; // Example: 0% tax
+    const delivery = 20;
+    const subtotal = order.total;
+    const total = subtotal + tax + delivery;
+  
+    yPos += 20;
+    doc.font('Helvetica-Bold');
+    doc.text('Subtotal', 350, yPos, { align: 'left' });
+    doc.text(`$${subtotal.toFixed(2)}`, 470, yPos, { align: 'right' });
+  
+    yPos += 20;
+    doc.text('Tax (0%)', 350, yPos, { align: 'left' });
+    doc.text(`$${tax.toFixed(2)}`, 470, yPos, { align: 'right' });
+  
+    yPos += 20;
+    doc.text('Delivery', 350, yPos, { align: 'left' });
+    doc.text(`$${delivery.toFixed(2)}`, 470, yPos, { align: 'right' });
+  
+    yPos += 25;
+    doc.fontSize(14).text('Total Amount Due', 350, yPos, { align: 'left' });
+    doc.text(`$${total.toFixed(2)}`, 470, yPos, { align: 'right' });
+  
+    // Footer
+    doc.moveDown(3);
+    doc.fontSize(10).font('Helvetica-Oblique').text(
+      'Thank you for your business! Payment is due within 30 days.\nIf you have any questions, contact us at support@Tech-Shop.com.',
+      50, // x-coordinate
+      yPos + 40, // optional: move it lower after totals
+      {
+        align: 'center',
+        width: 500
+      }
     );
-    doc.text(` - Qty: ${item.quantity} - $${item.price.toFixed(2)}`, { align: 'right' });
-  });
-  doc.text(` - Total: ${order.total} `, { align: 'right' });
-
-  // Footer section for notes or contact information (optional)
-  doc.moveDown(2); // Add space before footer
-  doc.fontSize(10).font('Helvetica-Oblique').text(
-    'Thank you for your order! For inquiries, contact support@Tech-Shop.com',
-    { align: 'center' }
-  );
-
-  // End the document and pipe it
-  doc.end();
-},
-
+    
+  
+    doc.end(); // Finalize the document
+  },
 
   
 };
