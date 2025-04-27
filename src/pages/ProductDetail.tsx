@@ -18,6 +18,21 @@ const ProductDetail = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [product, setProduct] = useState<Product | null>(null);
   const [isOnoff, setisOnOff] = useState(false);
+  const [isOnoff1, setisOnOff1] = useState(false);
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const response = await globalApi.getmakeorder();
+        // Assuming response = { showPrice: true/false }
+        setisOnOff1(response.allowmakeorder || false);
+      } catch (error) {
+        console.error("Failed to fetch status:", error);
+      }
+    };
+
+    fetchStatus();
+  }, []);
+
   useEffect(() => {
     const fetchStatus = async () => {
       try {
@@ -34,13 +49,14 @@ const ProductDetail = () => {
   const handleAddToCart = async () => {
     if (!product) return;
     const token = localStorage.getItem('authToken');
-    console.log(token);
+    // console.log(token);
 
     const user = await authApi.getCurrentUser(token);
-    console.log(user);
+    // console.log(user);
     
   
     await cartApi.addToCart(user.id,product.id1,1,product.price,product.name );  
+    
     // setIsAdding(true);
     // await addToCart(product);
     // setIsAdding(false);
@@ -133,7 +149,7 @@ const ProductDetail = () => {
             )}
           </div>
           
-          {user && (
+          {(user || isOnoff1) && (
             <Button 
               onClick={handleAddToCart}
               className="mt-4"
@@ -145,7 +161,7 @@ const ProductDetail = () => {
             </Button>
           )}
           
-          {!user && (
+          {!user && !isOnoff1 && (
             <div className="border rounded-lg p-4 bg-muted/20 mt-4">
               <p className="text-sm text-muted-foreground">
                 You need to be logged in to purchase this product.

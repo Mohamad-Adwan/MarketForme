@@ -1,0 +1,216 @@
+From aad8b81f85dcf387a9fb48e1a8b5db46455b52fa Mon Sep 17 00:00:00 2001
+From: Mohamad-Adwan <s1202827@stu.najah.edu>
+Date: Mon, 14 Apr 2025 11:49:27 +0300
+Subject: [PATCH 05/14] Donee
+
+---
+ index.html                    | 23 ++++++++----
+ package-lock.json             |  9 +++++
+ package.json                  |  1 +
+ src/components/LoginModal.tsx | 71 ++++++++++++++++++++++++++++-------
+ 4 files changed, 83 insertions(+), 21 deletions(-)
+
+diff --git a/index.html b/index.html
+index e9c3151..9940709 100644
+--- a/index.html
++++ b/index.html
+@@ -4,18 +4,27 @@
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Tech-Shop</title>
+-    <meta name="description" content="Tech-Shop" />
++    <meta name="description" content="Your one-stop shop for the latest tech gadgets." />
+     <meta name="author" content="Tech-Shop" />
+-
++  
++    <!-- Open Graph (Facebook, LinkedIn) -->
+     <meta property="og:title" content="Tech-Shop" />
+-    <meta property="og:description" content="Tech-Shop" />
++    <meta property="og:description" content="Your one-stop shop for the latest tech gadgets." />
+     <meta property="og:type" content="website" />
+-    <meta property="og:image" content="/src/images/logo.png" />
+-
++    <meta property="og:url" content="https://your-domain.com" />
++    <meta property="og:image" content="https://your-domain.com/images/logo.png" />
++  
++    <!-- Twitter Card -->
+     <meta name="twitter:card" content="summary_large_image" />
+-    <meta name="twitter:site" content="@Tech-Shop" />
+-    <meta name="twitter:image" content="/src/images/logo.png" />
++    <meta name="twitter:site" content="@TechShop" />
++    <meta name="twitter:title" content="Tech-Shop" />
++    <meta name="twitter:description" content="Your one-stop shop for the latest tech gadgets." />
++    <meta name="twitter:image" content="https://your-domain.com/images/logo.png" />
++  
++    <!-- Favicon (optional) -->
++    <link rel="icon" href="/favicon.ico" />
+   </head>
++  
+ 
+   <body>
+     <div id="root"></div>
+diff --git a/package-lock.json b/package-lock.json
+index 87b0351..39681c7 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -61,6 +61,7 @@
+         "react-day-picker": "^8.10.1",
+         "react-dom": "^18.3.1",
+         "react-hook-form": "^7.53.0",
++        "react-icons": "^5.5.0",
+         "react-resizable-panels": "^2.1.3",
+         "react-router-dom": "^6.26.2",
+         "recharts": "^2.12.7",
+@@ -7557,6 +7558,14 @@
+         "react": "^16.8.0 || ^17 || ^18 || ^19"
+       }
+     },
++    "node_modules/react-icons": {
++      "version": "5.5.0",
++      "resolved": "https://registry.npmjs.org/react-icons/-/react-icons-5.5.0.tgz",
++      "integrity": "sha512-MEFcXdkP3dLo8uumGI5xN3lDFNsRtrjbOEKDLD7yv76v4wpnEq2Lt2qeHaQOr34I/wPN3s3+N08WkQ+CW37Xiw==",
++      "peerDependencies": {
++        "react": "*"
++      }
++    },
+     "node_modules/react-is": {
+       "version": "18.3.1",
+       "resolved": "https://registry.npmjs.org/react-is/-/react-is-18.3.1.tgz",
+diff --git a/package.json b/package.json
+index 15c1246..1c73cb7 100644
+--- a/package.json
++++ b/package.json
+@@ -64,6 +64,7 @@
+     "react-day-picker": "^8.10.1",
+     "react-dom": "^18.3.1",
+     "react-hook-form": "^7.53.0",
++    "react-icons": "^5.5.0",
+     "react-resizable-panels": "^2.1.3",
+     "react-router-dom": "^6.26.2",
+     "recharts": "^2.12.7",
+diff --git a/src/components/LoginModal.tsx b/src/components/LoginModal.tsx
+index 83c825c..7060bc3 100644
+--- a/src/components/LoginModal.tsx
++++ b/src/components/LoginModal.tsx
+@@ -15,9 +15,13 @@ import { Input } from '@/components/ui/input';
+ import { useAuth } from '@/context/AuthContext';
+ import { toast } from 'sonner';
+ import { authApi } from '@/services/apiService';
++import { LuEye } from "react-icons/lu";
++import { LuEyeClosed } from "react-icons/lu";
++
+ import ForgotPasswordForm from './ForgotPasswordForm';
+ import ResetPasswordForm from './ResetPasswordForm';
+ import EmailVerificationForm from './EmailVerificationForm';
++import { EyeClosedIcon, EyeIcon } from 'lucide-react';
+ 
+ interface LoginModalProps {
+   isOpen: boolean;
+@@ -45,7 +49,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
+   
+   // Verification state
+   const [verificationEmail, setVerificationEmail] = useState('');
+-  
++  const [showPassword, setShowPassword] = useState(false);
++  const [showRegisterPassword, setshowRegisterPassword] = useState(false);
++  const [showRegisterPasswordConfermid, setshowRegisterPasswordConfermid] = useState(false);
++
+   const [isLoading, setIsLoading] = useState(false);
+   const { login, register } = useAuth();
+   /////// here edit
+@@ -237,16 +244,27 @@ useEffect(() => {
+               </div>
+               
+               <div className="space-y-2">
+-                <Label htmlFor="password">Password</Label>
+-                <Input 
+-                  id="password" 
+-                  type="password" 
+-                  placeholder="Enter your password"
+-                  value={password}
+-                  onChange={(e) => setPassword(e.target.value)} 
+-                  required
+-                />
+-              </div>
++      <Label htmlFor="password">Password</Label>
++      <div className="relative">
++        <Input 
++          id="password" 
++          type={showPassword ? 'text' : 'password'} 
++          placeholder="Enter your password"
++          value={password}
++          onChange={(e) => setPassword(e.target.value)} 
++          required
++          className="pr-10" // make space for the icon
++        />
++        <button
++          type="button"
++          onClick={() => setShowPassword(!showPassword)}
++          className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
++          tabIndex={-1}
++        >
++          {showPassword ? <EyeClosedIcon size={18} /> : <EyeIcon size={18} />}
++        </button>
++      </div>
++    </div>
+               
+               <div className="text-right">
+                 <Button 
+@@ -319,26 +337,51 @@ useEffect(() => {
+               
+               <div className="space-y-2">
+                 <Label htmlFor="register-password">Password</Label>
++                <div className="relative">
+                 <Input 
+                   id="register-password" 
+-                  type="password" 
++                  type={showRegisterPassword ? 'text' : 'password'}
+                   placeholder="Create a password"
+                   value={registerPassword}
+                   onChange={(e) => setRegisterPassword(e.target.value)} 
+                   required
++                  className="pr-10" // make space for the icon
+                 />
++                <button
++                type="button"
++                onClick={() => setshowRegisterPassword(!showRegisterPassword)}
++                className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
++                tabIndex={-1}
++                >
++                {showRegisterPassword ? <EyeClosedIcon size={18} /> : <EyeIcon size={18} />}
++                </button>
++                </div>
++                
+               </div>
+-              
++               
+               <div className="space-y-2">
+                 <Label htmlFor="confirm-password">Confirm Password</Label>
++                <div className="relative">
+                 <Input 
+                   id="confirm-password" 
+-                  type="password" 
++                  type={showRegisterPasswordConfermid ? 'text' : 'password'}
+                   placeholder="Confirm your password"
+                   value={confirmPassword}
+                   onChange={(e) => setConfirmPassword(e.target.value)} 
+                   required
++                  className="pr-10" // make space for the icon
++
+                 />
++                <button
++                type="button"
++                onClick={() => setshowRegisterPasswordConfermid(!showRegisterPasswordConfermid)}
++                className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
++                tabIndex={-1}
++ 
++                >
++               {showRegisterPasswordConfermid ? <EyeClosedIcon size={18} /> : <EyeIcon size={18} />}
++                </button>
++                </div>
+               </div>
+               
+               <DialogFooter>
+-- 
+2.45.1.windows.1
+

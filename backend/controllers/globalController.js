@@ -34,6 +34,33 @@ const globalController = {
       res.status(500).json({ error: "Failed to update global status" });
     }
   },
+  getmakeorder: async (req, res) => {
+    try {
+      const statuses = await Global.findOne(); // Only one expected
+      res.status(200).json({allowmakeorder:statuses.allowmakeorder});
+    } catch (err) {
+      console.error("Get Status Error:", err);
+      res.status(500).json({ error: "Failed to fetch global status" });
+    }
+  },
+  setmakeorder: async (req, res) => {
+    try {
+      const { status } = req.body;
+      let globalDoc = await Global.findOne();
+      if (!globalDoc) {
+        globalDoc = new Global({ allowmakeorder: status });
+      } else {
+        globalDoc.allowmakeorder = status;
+      }
+
+      await globalDoc.save();
+
+      res.status(200).json(globalDoc);
+    } catch (err) {
+      console.error("Set Status Error:", err);
+      res.status(500).json({ error: "Failed to update global status" });
+    }
+  },
   // In the backend controller
   printPDF : async (req, res) => {
     const { orderId } = req.query;

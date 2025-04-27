@@ -185,7 +185,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
         </div>
       
       
-      <div className="bg-white p-6 rounded-lg shadow w-full max-w-7xl h-[650px]">
+      <div className="bg-white p-6 rounded-lg shadow w-full max-w-7xl h-[770px]">
         <h3 className="text-xl font-semibold mb-4">Weekly Sales</h3>
         <div className="h-80">
           <ChartContainer

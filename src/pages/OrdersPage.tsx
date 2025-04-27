@@ -12,71 +12,14 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-// Mock data for fallback when API is unavailable
-// const mockOrders: Order[] = [
-//   {
-//     // id2: 1,
-//     // userId: '1',
-//     // userName: 'John Doe',
-//     // date: new Date().toISOString(),
-//     // status: 'pending',
-//     // total: 299.98,
-//     // items: [
-//     //   // {
-//     //   //   productId: 1,
-//     //   //   productName: 'Premium Headphones',
-//     //   //   quantity: 1,
-//     //   //   price: 199.99
-//     //   // },
-//     //   // {
-//     //   //   productId: 3,
-//     //   //   productName: 'Bluetooth Speaker',
-//     //   //   quantity: 1,
-//     //   //   price: 99.99
-//     //   // }
-//     // ]
-//   },
-//   {
-//     id2: 2,
-//     userId: '1',
-//     userName: 'John Doe',
-//     date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-//     status: 'delivered',
-//     total: 249.99,
-//     items: [
-//       // {
-//       //   productId: 2,
-//       //   itemname: 'Smart Watch',
-//       //   quantity: 1,
-//       //   price: 249.99
-//       // }
-//     ]
-//   }
-// ];
+
 
 const OrdersPage = () => {
   const { user } = useAuth();
   const [useMockData, setUseMockData] = useState(false);
   const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
   
-  // Load pending orders from localStorage
-  // useEffect(() => {
-  //   if (user) {
-  //     const storedPendingOrders = localStorage.getItem('pendingOrders');
-  //     if (storedPendingOrders) {
-  //       try {
-  //         const parsedOrders = JSON.parse(storedPendingOrders);
-  //         // Filter to only show orders for current user
-  //         const userPendingOrders = parsedOrders.filter((order: Order) => 
-  //           order.userId === user.id
-  //         );
-  //         setPendingOrders(userPendingOrders);
-  //       } catch (e) {
-  //         console.error('Error parsing pending orders:', e);
-  //       }
-  //     }
-  //   }
-  // }, [user]);
+
   const token =localStorage.getItem("authToken")
   const { data: orders = [], isLoading, error, refetch } = useQuery({
     queryKey: ['orders', user?.id],

@@ -1,167 +1,3 @@
-
-// const orderModel = require('../models/orderModel');
-
-// const orderController = {
-//   getUserOrders: (req, res) => {
-//     try {
-//       const userId = req.params.userId;
-//       const orders = orderModel.getUserOrders(userId);
-      
-//       // Database implementation (uncomment when ready)
-//       /*
-//       // Use async/await with a real database
-//       const dbOrders = await orderModel.getUserOrdersFromDb(userId);
-//       res.json(dbOrders);
-//       return;
-//       */
-      
-//       res.json(orders);
-//     } catch (error) {
-//       console.error('Error fetching user orders:', error);
-//       res.status(500).json({ error: 'Failed to fetch orders' });
-//     }
-//   },
-  
-//   createOrder: (req, res) => {
-//     const orderData = req.body;
-    
-//     if (!orderData.userId || !orderData.items || orderData.items.length === 0) {
-//       return res.status(400).json({ error: 'Invalid order data' });
-//     }
-    
-//     try {
-//       // Ensure userId is properly passed
-//       const newOrder = orderModel.createOrder(orderData);
-      
-//       // Database implementation (uncomment when ready)
-//       /*
-//       // Use async/await with a real database
-//       const dbOrder = await orderModel.createOrderInDb(orderData);
-//       res.status(201).json(dbOrder);
-//       return;
-//       */
-      
-//       res.status(201).json(newOrder);
-//     } catch (error) {
-//       console.error('Error creating order:', error);
-//       res.status(500).json({ error: 'Failed to create order' });
-//     }
-//   },
-  
-//   getOrderById: (req, res) => {
-//     try {
-//       const orderId = parseInt(req.params.orderId);
-//       const order = orderModel.getOrderById(orderId);
-      
-//       // Database implementation (uncomment when ready)
-//       /*
-//       // Use async/await with a real database
-//       const dbOrder = await orderModel.getOrderByIdFromDb(orderId);
-      
-//       if (!dbOrder) {
-//         return res.status(404).json({ error: 'Order not found' });
-//       }
-      
-//       res.json(dbOrder);
-//       return;
-//       */
-      
-//       if (!order) {
-//         return res.status(404).json({ error: 'Order not found' });
-//       }
-      
-//       res.json(order);
-//     } catch (error) {
-//       console.error('Error fetching order details:', error);
-//       res.status(500).json({ error: 'Failed to fetch order details' });
-//     }
-//   },
-
-//   updateOrderStatus: (req, res) => {
-//     try {
-//       const orderId = parseInt(req.params.orderId);
-//       const { status } = req.body;
-      
-//       if (!status) {
-//         return res.status(400).json({ error: 'Status is required' });
-//       }
-      
-//       // Database implementation (uncomment when ready)
-//       /*
-//       // Use async/await with a real database
-//       const dbUpdatedOrder = await orderModel.updateOrderStatusInDb(orderId, status);
-      
-//       if (!dbUpdatedOrder) {
-//         return res.status(404).json({ error: 'Order not found' });
-//       }
-      
-//       res.json(dbUpdatedOrder);
-//       return;
-//       */
-      
-//       const updatedOrder = orderModel.updateOrderStatus(orderId, status);
-      
-//       if (!updatedOrder) {
-//         return res.status(404).json({ error: 'Order not found' });
-//       }
-      
-//       res.json(updatedOrder);
-//     } catch (error) {
-//       console.error('Error updating order status:', error);
-//       res.status(500).json({ error: 'Failed to update order status' });
-//     }
-//   },
-
-//   getAllOrders: (req, res) => {
-//     try {
-//       // Database implementation (uncomment when ready)
-//       /*
-//       // Use async/await with a real database
-//       const dbOrders = await orderModel.getAllOrdersFromDb();
-//       res.json(dbOrders);
-//       return;
-//       */
-      
-//       const orders = orderModel.getAllOrders();
-//       res.json(orders);
-//     } catch (error) {
-//       console.error('Error fetching all orders:', error);
-//       res.status(500).json({ error: 'Failed to fetch orders' });
-//     }
-//   },
-  
-//   deleteOrder: (req, res) => {
-//     try {
-//       const orderId = parseInt(req.params.orderId);
-      
-//       // Database implementation (uncomment when ready)
-//       /*
-//       // Use async/await with a real database
-//       const success = await orderModel.deleteOrderFromDb(orderId);
-      
-//       if (!success) {
-//         return res.status(404).json({ error: 'Order not found' });
-//       }
-      
-//       res.json({ message: 'Order deleted successfully' });
-//       return;
-//       */
-      
-//       const success = orderModel.deleteOrder(orderId);
-      
-//       if (!success) {
-//         return res.status(404).json({ error: 'Order not found' });
-//       }
-      
-//       res.json({ message: 'Order deleted successfully' });
-//     } catch (error) {
-//       console.error('Error deleting order:', error);
-//       res.status(500).json({ error: 'Failed to delete order' });
-//     }
-//   }
-// };
-
-// module.exports = orderController;
 const User = require('../models/userModel'); // Corrected import for User model
 const Order = require('../models/orderModel');
 const {Product} = require('../models/productModel'); // Assuming you have a Product model for fetching product details
@@ -346,6 +182,57 @@ const fullProductDetails = await Product.find({ id1: { $in: topProductIds } });
         total: orderData.total,
         userName: orderData.userName,
         phone:user.phone,
+        status: 'pending',
+        items: orderData.items.map(item => ({
+          id1: item.id1, // Corrected field name to match your schema
+          quantity: item.quantity,
+          price: item.price,
+          image:{data:item.image.data,
+            contentType:item.image.contentType,
+            FileName:item.image.FileName
+          },
+          itemname:item.itemname
+
+        }))
+      });
+
+      await newOrder.save();
+      res.status(201).json(newOrder);
+    } catch (error) {
+      console.error('Error creating order:', error);
+      res.status(500).json({ error: 'Failed to create order' });
+    }
+  },
+  createOrderGuest: async (req, res) => {
+    try {
+      const orderData = req.body;
+
+      if (!orderData.userId || !orderData.total, !orderData.phone) {
+        return res.status(400).json({ error: 'Invalid order data' });
+      }
+
+      
+      
+      ////here edite
+      for (const item of orderData.items) {
+        const product = await Product.findOne({ id1: item.id1 });
+      
+        if (!product || product.stock < item.quantity) {
+          return res.status(400).json({ error: `Insufficient stock for product: ${item.itemname}` });
+        }
+      
+        item.image = {
+          data: product.image.data,
+          contentType: product.image.contentType,
+          FileName: product.image.FileName
+        };
+      }
+     console.log('User found:', orderData);
+      const newOrder = new Order({
+        userId: orderData.userId, // Corrected field name to match your schema
+        total: orderData.total,
+        userName: orderData.userName,
+        phone:orderData.phone,
         status: 'pending',
         items: orderData.items.map(item => ({
           id1: item.id1, // Corrected field name to match your schema

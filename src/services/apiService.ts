@@ -263,6 +263,11 @@ export const orderApi = {
       method: 'POST',
       body: JSON.stringify(orderData),
     }),
+    createOrderGuest: ( orderData: Partial<Order>) => 
+      apiRequest('orders/guest', {
+        method: 'POST',
+        body: JSON.stringify(orderData),
+      }),
   getOrderDetails: (orderId: number) => 
     apiRequest(`orders/detail/${orderId}`),
 
@@ -296,6 +301,14 @@ export const globalApi=
 getStatus:()=>apiRequest('global/getpriceState'),
 
 setStatus:(status:boolean)=>apiRequest('global/putpriceState',
+  {
+    method: 'PUT',
+    body: JSON.stringify({ status }),
+  }
+),
+getmakeorder:()=>apiRequest('global/getmakeorder'),
+
+setmakeorder:(status:boolean)=>apiRequest('global/putmakeorder',
   {
     method: 'PUT',
     body: JSON.stringify({ status }),

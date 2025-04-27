@@ -14,6 +14,7 @@ router.get('/Dasdashboard',orderController.getDashboard);
 
 // // Create order
 router.post('/', orderController.createOrder);
+router.post('/guest', orderController.createOrderGuest);
 
 // // Get order details
 // Get order details by orderId
@@ -25,21 +26,6 @@ router.put('/edit/item/:itemId', orderController.edititemQuantity);
 router.delete('/:orderId', orderController.deleteOrder);
 router.delete('/item/:itemId', orderController.deleteitem);
 
-// When implementing async/await, you may want to use an errorHandler wrapper
-// Uncomment this when using a real database
-/*
-// Error handling wrapper for async routes
-const asyncHandler = fn => (req, res, next) => {
-  return Promise.resolve(fn(req, res, next)).catch(next);
-};
 
-// Example of using asyncHandler with async controller methods
-// router.get('/', asyncHandler(orderController.getAllOrders));
-// router.post('/', asyncHandler(orderController.createOrder));
-// router.get('/:userId', asyncHandler(orderController.getUserOrders));
-// router.get('/detail/:orderId', asyncHandler(orderController.getOrderById));
-// router.put('/status/:orderId', asyncHandler(orderController.updateOrderStatus));
-// router.delete('/:orderId', asyncHandler(orderController.deleteOrder));
-*/
 
 module.exports = router;

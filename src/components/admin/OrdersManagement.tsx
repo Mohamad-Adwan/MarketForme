@@ -1,228 +1,4 @@
 
-// import React, { useState } from 'react';
-// import { Order } from '@/types';
-// import { Button } from '@/components/ui/button';
-// import { Badge } from '@/components/ui/badge';
-// import { 
-//   Select, 
-//   SelectContent, 
-//   SelectItem, 
-//   SelectTrigger, 
-//   SelectValue 
-// } from '@/components/ui/select';
-// import {
-//   Table,
-//   TableBody,
-//   TableCell,
-//   TableHead,
-//   TableHeader,
-//   TableRow,
-// } from '@/components/ui/table';
-// import { 
-//   Pencil, 
-//   RefreshCw, 
-//   Trash2,
-//   AlertTriangle 
-// } from 'lucide-react';
-// import {
-//   AlertDialog,
-//   AlertDialogAction,
-//   AlertDialogCancel,
-//   AlertDialogContent,
-//   AlertDialogDescription,
-//   AlertDialogFooter,
-//   AlertDialogHeader,
-//   AlertDialogTitle,
-//   AlertDialogTrigger,
-// } from "@/components/ui/alert-dialog";
-// import { getStatusColor } from './AdminUtils';
-
-// interface OrdersManagementProps {
-//   displayOrders: Order[];
-//   isLoadingOrders: boolean;
-//   useMockData: boolean;
-//   ordersError: unknown;
-//   refetchOrders: () => void;
-//   setUseMockData: (value: boolean) => void;
-//   handleUpdateOrderStatus: (orderId: number, status: string) => void;
-//   handleDeleteOrder: (orderId: number) => void;
-// }
-
-// const OrdersManagement: React.FC<OrdersManagementProps> = ({
-//   displayOrders,
-//   isLoadingOrders,
-//   useMockData,
-//   ordersError,
-//   refetchOrders,
-//   setUseMockData,
-//   handleUpdateOrderStatus,
-//   handleDeleteOrder
-// }) => {
-//   const [editingOrderStatus, setEditingOrderStatus] = useState<{id: number, status: string} | null>(null);
-//   const [deletingOrderId, setDeletingOrderId] = useState<number | null>(null);
-
-//   const confirmDelete = (orderId: number) => {
-//     handleDeleteOrder(orderId);
-//     setDeletingOrderId(null);
-//   };
-
-//   return (
-//     <>
-//       <div className="flex justify-between items-center mb-6">
-//         <h2 className="text-xl font-semibold">Orders Management</h2>
-//         <div className="flex gap-2">
-//           {!useMockData && (
-//             <Button variant="outline" onClick={() => refetchOrders()} className="flex items-center gap-2">
-//               <RefreshCw className="h-4 w-4" />
-//               <span>Refresh</span>
-//             </Button>
-//           )}
-//           {ordersError && !useMockData && (
-//             <Button onClick={() => setUseMockData(true)}>
-//               View Sample Orders
-//             </Button>
-//           )}
-//           {useMockData && (
-//             <Badge variant="outline" className="bg-yellow-100 text-yellow-800">Using Sample Data</Badge>
-//           )}
-//         </div>
-//       </div>
-      
-//       <div className="bg-white shadow rounded-lg overflow-hidden">
-//         <div className="overflow-x-auto">
-//           <Table>
-//             <TableHeader>
-//               <TableRow>
-//                 <TableHead>Order ID</TableHead>
-//                 <TableHead>Customer</TableHead>
-//                 <TableHead>Date</TableHead>
-//                 <TableHead>Status</TableHead>
-//                 <TableHead>Items</TableHead>
-//                 <TableHead>Total</TableHead>
-//                 <TableHead>Actions</TableHead>
-//               </TableRow>
-//             </TableHeader>
-//             <TableBody>
-//               {isLoadingOrders && !useMockData ? (
-//                 <TableRow>
-//                   <TableCell colSpan={7} className="text-center py-4">
-//                     Loading orders...
-//                   </TableCell>
-//                 </TableRow>
-//               ) : displayOrders.length > 0 ? (
-//                 displayOrders.map((order) => (
-//                   <TableRow key={order.id}>
-//                     <TableCell>#{order.id}</TableCell>
-//                     <TableCell>{order.userName}</TableCell>
-//                     <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
-//                     <TableCell>
-//                       {editingOrderStatus && editingOrderStatus.id === order.id ? (
-//                         <Select
-//                           value={editingOrderStatus.status}
-//                           onValueChange={(value) => {
-//                             setEditingOrderStatus({...editingOrderStatus, status: value});
-//                           }}
-//                         >
-//                           <SelectTrigger className="w-32">
-//                             <SelectValue placeholder="Status" />
-//                           </SelectTrigger>
-//                           <SelectContent>
-//                             <SelectItem value="pending">Pending</SelectItem>
-//                             <SelectItem value="processing">Processing</SelectItem>
-//                             <SelectItem value="shipped">Shipped</SelectItem>
-//                             <SelectItem value="delivered">Delivered</SelectItem>
-//                             <SelectItem value="cancelled">Cancelled</SelectItem>
-//                           </SelectContent>
-//                         </Select>
-//                       ) : (
-//                         <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(order.status)}`}>
-//                           {order.status}
-//                         </span>
-//                       )}
-//                     </TableCell>
-//                     <TableCell>{order.items.length}</TableCell>
-//                     <TableCell>${order.total.toFixed(2)}</TableCell>
-//                     <TableCell>
-//                       {editingOrderStatus && editingOrderStatus.id === order.id ? (
-//                         <div className="flex space-x-2">
-//                           <Button 
-//                             size="sm" 
-//                             variant="outline"
-//                             onClick={() => setEditingOrderStatus(null)}
-//                           >
-//                             Cancel
-//                           </Button>
-//                           <Button 
-//                             size="sm"
-//                             onClick={() => handleUpdateOrderStatus(order.id, editingOrderStatus.status)}
-//                           >
-//                             Save
-//                           </Button>
-//                         </div>
-//                       ) : (
-//                         <div className="flex space-x-2">
-//                           <Button 
-//                             variant="ghost" 
-//                             size="sm" 
-//                             onClick={() => setEditingOrderStatus({id: order.id, status: order.status})}
-//                           >
-//                             <Pencil className="h-4 w-4 mr-2" />
-//                             Status
-//                           </Button>
-                          
-//                           <AlertDialog>
-//                             <AlertDialogTrigger asChild>
-//                               <Button 
-//                                 variant="ghost" 
-//                                 size="sm"
-//                                 className="text-red-500 hover:text-white hover:bg-red-500"
-//                               >
-//                                 <Trash2 className="h-4 w-4 mr-2" />
-//                                 Delete
-//                               </Button>
-//                             </AlertDialogTrigger>
-//                             <AlertDialogContent>
-//                               <AlertDialogHeader>
-//                                 <AlertDialogTitle className="flex items-center gap-2">
-//                                   <AlertTriangle className="h-5 w-5 text-red-500" />
-//                                   Confirm Deletion
-//                                 </AlertDialogTitle>
-//                                 <AlertDialogDescription>
-//                                   Are you sure you want to delete order #{order.id}? This action cannot be undone.
-//                                 </AlertDialogDescription>
-//                               </AlertDialogHeader>
-//                               <AlertDialogFooter>
-//                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-//                                 <AlertDialogAction 
-//                                   onClick={() => handleDeleteOrder(order.id)}
-//                                   className="bg-red-500 hover:bg-red-600"
-//                                 >
-//                                   Delete
-//                                 </AlertDialogAction>
-//                               </AlertDialogFooter>
-//                             </AlertDialogContent>
-//                           </AlertDialog>
-//                         </div>
-//                       )}
-//                     </TableCell>
-//                   </TableRow>
-//                 ))
-//               ) : (
-//                 <TableRow>
-//                   <TableCell colSpan={7} className="text-center py-4">
-//                     No orders found
-//                   </TableCell>
-//                 </TableRow>
-//               )}
-//             </TableBody>
-//           </Table>
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-// export default OrdersManagement;
 import React, { useState, useEffect } from 'react';
 import { DateRangeFilter, Order } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -302,7 +78,7 @@ const OrdersManagement: React.FC = () => {
   const [dateFilter, setDateFilter] = useState<DateRangeFilter>({});
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [deletingOrderId, setDeletingOrderId] = useState<number | null>(null);
- 
+  const [isOnoff, setisOnOff] = useState(false);
   const fetchOrders = async () => {
     setIsLoadingOrders(true);
     try {
@@ -438,7 +214,18 @@ const OrdersManagement: React.FC = () => {
   const clearDateFilter = () => {
     setDateFilter({});
   };
+  
+const toggle = async () => {
+    const newStatus = !isOnoff;
+    setisOnOff(newStatus);
 
+    try {
+      console.log(newStatus)
+      await globalApi.setmakeorder(newStatus);
+    } catch (error) {
+      console.error("Failed to update status:", error);
+    }
+  }
   const formatDateRange = () => {
     if (dateFilter.from && dateFilter.to) {
       return `${format(dateFilter.from, 'MMM d, yyyy')} - ${format(dateFilter.to, 'MMM d, yyyy')}`;
@@ -458,7 +245,21 @@ const OrdersManagement: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Orders Management</h2>
         <div className="flex gap-2">
-          
+        <div className="flex items-center gap-3">
+        <span className="text-lg font-semibold">Allow Order</span>
+        <button
+          onClick={toggle}
+          className={`w-14 h-8 flex items-center rounded-full p-1 transition-all duration-300 ease-in-out
+            ${isOnoff ? 'bg-green-500' : 'bg-gray-300'}
+            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer active:scale-95`}
+        >
+          <div
+            className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ${
+              isOnoff ? 'translate-x-6' : 'translate-x-0'
+            }`}
+          />
+        </button>
+      </div>
         <Select 
             value={groupBy} 
             onValueChange={(value: 'none' | 'customer') => setGroupBy(value)}

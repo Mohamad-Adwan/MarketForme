@@ -6,6 +6,10 @@ const globalsSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  allowmakeorder: {
+    type: Boolean,
+    default: true,
+  }
   // Add more global toggles if needed
 }, { timestamps: true });
 

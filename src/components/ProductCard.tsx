@@ -19,6 +19,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { user } = useAuth();
   const [isAdding, setIsAdding] = useState(false);
   const [isOnoff, setisOnOff] = useState(false);
+    const [isOnoff1, setisOnOff1] = useState(false);
+  
   useEffect(() => {
     const fetchStatus = async () => {
       try {
@@ -32,7 +34,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
     fetchStatus();
   }, []);
-  
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const response = await globalApi.getmakeorder();
+        // Assuming response = { showPrice: true/false }
+        setisOnOff1(response.allowmakeorder || false);
+      } catch (error) {
+        console.error("Failed to fetch status:", error);
+      }
+    };
+
+    fetchStatus();
+  }, []);
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -103,7 +117,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </Link>
           </Button>
           
-          {user && (
+          {(user || isOnoff1) && (
             <Button 
               size="sm" 
               onClick={handleAddToCart} 
@@ -114,7 +128,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               {isAdding ? 'Adding...' : 'Add'}
             </Button>
           )}
+        
         </div>
+        {!user && !isOnoff1 && (
+            <div className="border rounded-lg p-3 bg-muted/20 mt-4">
+              <p className="text-sm text-muted-foreground">
+                You need to be logged in to purchase this product.
+              </p>
+            </div>
+          )}
       </CardFooter>
     </Card>
   );
