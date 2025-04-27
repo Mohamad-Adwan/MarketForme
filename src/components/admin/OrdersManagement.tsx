@@ -80,6 +80,8 @@ const OrdersManagement: React.FC = () => {
   const [deletingOrderId, setDeletingOrderId] = useState<number | null>(null);
   const [isOnoff, setisOnOff] = useState(false);
   const fetchOrders = async () => {
+    const respon = await globalApi.getmakeorder();
+    setisOnOff(respon.allowmakeorder);
     setIsLoadingOrders(true);
     try {
       const token = localStorage.getItem('authToken');
@@ -254,8 +256,8 @@ const toggle = async () => {
             focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer active:scale-95`}
         >
           <div
-            className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ${
-              isOnoff ? 'translate-x-6' : 'translate-x-0'
+            className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 
+              ${isOnoff ? 'translate-x-6' : 'translate-x-0'
             }`}
           />
         </button>
