@@ -81,7 +81,7 @@ const OrdersManagement: React.FC = () => {
   const [isOnoff, setisOnOff] = useState(false);
   const fetchOrders = async () => {
     const respon = await globalApi.getmakeorder();
-    setisOnOff(respon.allowmakeorder);
+    setisOnOff(respon.allowmakeorder);     
     setIsLoadingOrders(true);
     try {
       const token = localStorage.getItem('authToken');
