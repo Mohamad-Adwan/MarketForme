@@ -381,22 +381,13 @@ registerWithPhone : async (req, res) => {
     const user = await User.findOne({ email });
       user.phone = phoneNumber;
       await user.save();
-    // Step 2: Call the API to send a verification code to the phone number
-    //const response = await authApi.sendPhoneVerificationCode(phoneNumber,user.id);
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-    // Step 3: Send the verification code to the phone number
-    NumberVerification({ phoneNumber: phoneNumber, code: verificationCode }); 
-      user.phoneVerified = false;
-      user.verificationCode = verificationCode;
-      await user.save();
-    // if (response.status === 200) {
-    //   // Success: Show success message or proceed to next step
-    //   console.success('Verification code sent to your phone');
-
-    // } else {
-    //   // Failure: Handle any failure responses from the API
-    //   console.error('Failed to send verification code. Please try again');
-    // }
+    
+    // const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    // NumberVerification({ phoneNumber: phoneNumber, code: verificationCode }); 
+    //   user.phoneVerified = false;
+    //   user.verificationCode = verificationCode;
+    // await user.save();
+   
   } catch (error) {
     // Catch errors from API or other issues
     console.error('Error during phone verification:', error);

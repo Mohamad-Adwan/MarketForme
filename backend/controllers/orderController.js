@@ -154,13 +154,13 @@ const fullProductDetails = await Product.find({ id1: { $in: topProductIds } });
         return res.status(404).json({ error: 'User not found' });
       }
 
-      const isPhoneVerified = user.phoneVerified; // Ensure this property exists in your User model
-      if (!isPhoneVerified) {
-        return res.status(403).json({ 
-          error: 'Phone verification required',
-          message: 'Please verify your phone number before creating orders'
-        });
-      }
+      // const isPhoneVerified = user.phoneVerified; // Ensure this property exists in your User model
+      // if (!isPhoneVerified) {
+      //   return res.status(403).json({ 
+      //     error: 'Phone verification required',
+      //     message: 'Please verify your phone number before creating orders'
+      //   });
+      // }
       
       ////here edite
       for (const item of orderData.items) {
@@ -368,8 +368,15 @@ const fullProductDetails = await Product.find({ id1: { $in: topProductIds } });
         const order = await Order.findOne({ id2: orderId });
         const user = await User.findOne({ id: order.userId });
         if (!user) {
-          return res.status(404).json({ error: 'User not found' });
+          for (const item of order.items) {
+            const product = await Product.findOne({ id1: item.id1 });
+            if (product) {
+              product.stock -= item.quantity;
+              await product.save();
+            }
+          }
         }
+        else{
         user.ordersCount += 1; // Increment the user's orders count
         await user.save();
         for (const item of order.items) {
@@ -379,6 +386,7 @@ const fullProductDetails = await Product.find({ id1: { $in: topProductIds } });
             await product.save();
           }
         }
+      }
       }
 
     

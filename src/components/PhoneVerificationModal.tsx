@@ -208,9 +208,7 @@ const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
                 </InputOTP>
               </div>
               
-              <p className="text-xs text-muted-foreground text-center mt-2">
-                For demo purposes, check the console for the verification code
-              </p>
+             
             </div>
             
             <div className="flex justify-end space-x-2">
