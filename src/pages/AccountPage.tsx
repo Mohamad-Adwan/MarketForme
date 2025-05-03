@@ -14,10 +14,10 @@ import { format } from 'date-fns';
 
 const AccountPage = () => {
   const { user, logout } = useAuth();
-  
+  const token = localStorage.getItem('authToken');
   const { data: orders, isLoading } = useQuery({
     queryKey: ['orders', user?.id],
-    queryFn: () => user ? orderApi.getOrders(user.id) : Promise.resolve([]),
+    queryFn: () => user ? orderApi.getOrders(token,user.id) : Promise.resolve([]),
     enabled: !!user,
   });
   
@@ -117,9 +117,9 @@ const AccountPage = () => {
             ) : orders && orders.length > 0 ? (
               <div className="space-y-4">
                 {orders.slice(0, 3).map((order: any) => (
-                  <div key={order.id} className="border rounded-lg p-4">
+                  <div key={order.id2} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-medium">Order #{order.id}</h3>
+                      <h3 className="font-medium">Order #{order.id2}</h3>
                       <Badge className={getStatusColor(order.status)}>{order.status}</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground mb-3">
@@ -128,7 +128,7 @@ const AccountPage = () => {
                     
                     <div className="border-t pt-2 mt-2 flex justify-between items-center">
                       <span className="text-sm">{order.items.length} items</span>
-                      <span className="font-medium">${order.total.toFixed(2)}</span>
+                      <span className="font-medium">{(Number(order.deliveryFee)+order.total).toFixed(2)}₪</span>
                     </div>
                   </div>
                 ))}

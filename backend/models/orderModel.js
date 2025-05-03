@@ -9,6 +9,8 @@ const orderSchema = new mongoose.Schema({
   userId: { type: Number, required: true },
   total: { type: Number, required: true },
   phone: { type: String, required: true },
+  deliveryOption: { type: String, required: true },
+  deliveryFee: { type: Number, required: true },
   items: [
     {
       id1: { type: Number, required: true },  // productId

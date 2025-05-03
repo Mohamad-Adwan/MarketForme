@@ -168,7 +168,9 @@ const OrdersManagement: React.FC = () => {
     (order.id2?.toString() || '').includes(searchQuery) ||
     (order.userName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
     (order.status || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (order.total?.toString() || '').includes(searchQuery) ||
+    (order.total?.toString() || '').includes(searchQuery) 
+    //delete this ti not search using itmename
+    ||
     (order.items || []).some(item => 
       (item.itemname || '').toLowerCase().includes(searchQuery.toLowerCase())
       );
@@ -374,7 +376,7 @@ const toggle = async () => {
                           <Badge variant="outline" className="bg-blue-100 text-blue-800">
                             {data.count} order{data.count !== 1 ? 's' : ''}
                           </Badge>
-                          <span className="font-semibold">${data.totalValue.toFixed(2)}</span>
+                          <span className="font-semibold">{data.totalValue.toFixed(2)}₪</span>
                         </div>
                       </div>
                       {//make this as after
@@ -389,6 +391,9 @@ const toggle = async () => {
                                 <TableHead>Status</TableHead>
                                 <TableHead>Items</TableHead>
                                 <TableHead>Total</TableHead>
+                                <TableHead>Delivery Option</TableHead>
+                                <TableHead>Delivery Fee</TableHead>
+                                
                                 <TableHead>Actions</TableHead>
                               </TableRow>
                               
@@ -425,7 +430,10 @@ const toggle = async () => {
           )}
         </TableCell>
         <TableCell>{order.items.length}</TableCell>
-        <TableCell>${order.total.toFixed(2)}</TableCell>
+        <TableCell>{order.total.toFixed(2)}₪</TableCell>
+        <TableCell>{order.deliveryOption}</TableCell>
+        <TableCell>{Number(order.deliveryFee).toFixed(2)}₪</TableCell>
+
         <TableCell>
           {editingOrderStatus && editingOrderStatus.id === order.id2 ? (
             <div className="flex space-x-2">
@@ -480,15 +488,15 @@ const toggle = async () => {
                 {/* 👇 Expanded items row */}
               {expandedOrders.has(order.id2) && (
                               <TableRow>
-                        <TableCell colSpan={7} className="bg-gray-100">
-                          <ul>
+                        <TableCell colSpan={10} className="bg-gray-100">
+                          <ul >
                             {Array.isArray(order.items) && order.items.length ? (
                                    
                                       <li  className="py-1 pl-4">
                                     <table className="w-full">
                                     <thead>
                                     <tr>
-                                    <th className="text-left">Item</th>
+                                    <th className="text-left ">Item</th>
                                     <th className="text-left">Quantity</th>
                                     <th className="text-left">Image</th>
                                     <th className="text-left">Price</th>
@@ -517,7 +525,7 @@ const toggle = async () => {
                                         {item.image && <img src={item.image} alt={item.itemname} className="w-16 h-16" />}
                                       </td>
                                       <td className="py-2">
-                                        {item.price && <span>${item.price.toFixed(2)}</span>}
+                                        {item.price && <span>{item.price.toFixed(2)}₪</span>}
                                       </td>
                                       <td>
                                       {EditingitemQuantity && EditingitemQuantity.id1 === item.id1 ? (
@@ -584,7 +592,9 @@ const toggle = async () => {
                                 )}
                                   </td>
                                     </tr>
-                                  ))}
+
+                                  )
+                                 )}
                                 </tbody>
                               </table>
                             </li>
@@ -629,7 +639,7 @@ const toggle = async () => {
 
 
 
-        (<div className="p-4">
+              (<div className="p-4">
               {Object.keys(groupedOrders).length === 0 ? (
                 <div className="text-center py-4">No orders found</div>
               ) : (
@@ -653,11 +663,10 @@ const toggle = async () => {
                           <Badge variant="outline" className="bg-blue-100 text-blue-800">
                             {data.count} order{data.count !== 1 ? 's' : ''}
                           </Badge>
-                          <span className="font-semibold">${data.totalValue.toFixed(2)}</span>
+                          <span className="font-semibold">{data.totalValue.toFixed(2)}₪</span>
                         </div>
                       </div>
-                      {//make this as after
-                      }
+                      
                       {expandedGroups.includes(customer) && (
                         <CardContent className="pt-4">
                           <Table>
@@ -668,12 +677,14 @@ const toggle = async () => {
                                 <TableHead>Status</TableHead>
                                 <TableHead>Items</TableHead>
                                 <TableHead>Total</TableHead>
+                                <TableHead>Delivery Option</TableHead>
+                                <TableHead>Delivery Fee</TableHead>
                                 <TableHead>Actions</TableHead>
                               </TableRow>
                               
                             </TableHeader>
                             <TableBody>
-                {filteredOrders.map((order) => (
+                   { data.orders.map((order) => (
                   <React.Fragment key={order.id2}>
                     <TableRow>
                       <TableCell>#{order.id2}</TableCell>
@@ -684,83 +695,85 @@ const toggle = async () => {
                             value={editingOrderStatus.status}
                             onValueChange={(value) => {
                               setEditingOrderStatus({ ...editingOrderStatus, status: value });
-                            }}
-            >
-              <SelectTrigger className="w-32">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="processing">Processing</SelectItem>
-                <SelectItem value="shipped">Shipped</SelectItem>
-                <SelectItem value="delivered">Delivered</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
-          ) : (
-            <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(order.status)}`}>
-              {order.status}
-            </span>
-          )}
-        </TableCell>
-        <TableCell>{order.items.length}</TableCell>
-        <TableCell>${order.total.toFixed(2)}</TableCell>
-        <TableCell>
-          {editingOrderStatus && editingOrderStatus.id === order.id2 ? (
-            <div className="flex space-x-2">
-              <Button size="sm" variant="outline" onClick={() => setEditingOrderStatus(null)}>Cancel</Button>
-              <Button size="sm" onClick={() => handleUpdateOrderStatus(order.id2, editingOrderStatus.status)}>Save</Button>
-            </div>
-          ) : (
-            <div className="flex space-x-2">
-              <Button variant="outline" size="sm" onClick={() => toggleExpandOrder(order.id2)}>
-                <Package className="h-4 w-4 mr-2" />
-                Details
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => setEditingOrderStatus({ id: order.id2, status: order.status })}>
-                <Pencil className="h-4 w-4 mr-2" />
-                Status
-              </Button>
-              <Button  size="sm"
-                              variant="outline"
-                              onClick={() => saveOrderAsPDF(order.id2)}
-                              
-                               ><FontAwesomeIcon icon={faFilePdf} />Save</Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-red-500 hover:text-white hover:bg-red-500">
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className="flex items-center gap-2">
-                      <AlertTriangle className="h-5 w-5 text-red-500" />
-                      Confirm Deletion
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to delete order #{order.id2}? This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handleDeleteOrder(order.id2)} className="bg-red-500 hover:bg-red-600">
-                      Delete
+                                    }}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="processing">Processing</SelectItem>
+                        <SelectItem value="shipped">Shipped</SelectItem>
+                        <SelectItem value="delivered">Delivered</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(order.status)}`}>
+                      {order.status}
+                    </span>
+                  )}
+                      </TableCell>
+                      <TableCell>{order.items.length}</TableCell>
+                      <TableCell>{order.total.toFixed(2)}₪</TableCell>
+                      <TableCell>{order.deliveryOption}</TableCell>
+                      <TableCell>{Number(order.deliveryFee).toFixed(2)}₪</TableCell>
+                      <TableCell>
+                        {editingOrderStatus && editingOrderStatus.id === order.id2 ? (
+                          <div className="flex space-x-2">
+                            <Button size="sm" variant="outline" onClick={() => setEditingOrderStatus(null)}>Cancel</Button>
+                            <Button size="sm" onClick={() => handleUpdateOrderStatus(order.id2, editingOrderStatus.status)}>Save</Button>
+                          </div>
+                        ) : (
+                          <div className="flex space-x-2">
+                            <Button variant="outline" size="sm" onClick={() => toggleExpandOrder(order.id2)}>
+                              <Package className="h-4 w-4 mr-2" />
+                              Details
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => setEditingOrderStatus({ id: order.id2, status: order.status })}>
+                              <Pencil className="h-4 w-4 mr-2" />
+                              Status
+                            </Button>
+                            <Button  size="sm"
+                                    variant="outline"
+                                    onClick={() => saveOrderAsPDF(order.id2)}
+                                    
+                                    ><FontAwesomeIcon icon={faFilePdf} />Save</Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="sm" className="text-red-500 hover:text-white hover:bg-red-500">
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="flex items-center gap-2">
+                            <AlertTriangle className="h-5 w-5 text-red-500" />
+                            Confirm Deletion
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete order #{order.id2}? This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDeleteOrder(order.id2)} className="bg-red-500 hover:bg-red-600">
+                            Delete
                     </AlertDialogAction>
                   </AlertDialogFooter>
-                </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                        )}
-                </TableCell>
-                </TableRow>
+                    </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                            )}
+                    </TableCell>
+                    </TableRow>
 
-                {/* 👇 Expanded items row */}
-              {expandedOrders.has(order.id2) && (
+                    {/* 👇 Expanded items row */}
+                  {expandedOrders.has(order.id2) && (
                               <TableRow>
-                        <TableCell colSpan={7} className="bg-gray-100">
-                          <ul>
+                        <TableCell colSpan={10} className="bg-gray-100">
+                          <ul >
                             {Array.isArray(order.items) && order.items.length ? (
                                 <li  className="py-1 pl-4">
                         <table className="w-full">
@@ -796,7 +809,7 @@ const toggle = async () => {
                                   {item.image && <img src={item.image} alt={item.itemname} className="w-16 h-16" />}
                                 </td>
                                 <td className="py-2">
-                                  {item.price && <span>${item.price.toFixed(2)}</span>}
+                                  {item.price && <span>{item.price.toFixed(2)}₪</span>}
                                 </td>
                                 <td>
                                 {EditingitemQuantity && EditingitemQuantity.id1 === item.id1 ? (
@@ -891,8 +904,9 @@ const toggle = async () => {
                   ))}
                 </div>
               )}
-            </div>)) :((filteredOrders.length < 0) ? 
-//here inded first
+            </div>)) :
+            ((filteredOrders.length < 0) ? 
+        //here inded first
           (<Table>
             <TableHeader>
               <TableRow>
@@ -902,13 +916,15 @@ const toggle = async () => {
                 <TableHead>Date</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Total</TableHead>
+                <TableHead>Delivery Option</TableHead>
+                <TableHead>Delivery Fee</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoadingOrders  ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-4">
+                  <TableCell colSpan={10} className="text-center py-4">
                     Loading orders...
                   </TableCell>
                 </TableRow>
@@ -945,7 +961,9 @@ const toggle = async () => {
                           </span>
                         )}
                       </TableCell>
-                      <TableCell>${order.total.toFixed(2)}</TableCell>
+                      <TableCell>{order.total.toFixed(2)}₪</TableCell>
+                      <TableCell>{order.deliveryOption}</TableCell>
+                      <TableCell>{Number(order.deliveryFee).toFixed(2)}₪</TableCell>
                       <TableCell>
                         {editingOrderStatus && editingOrderStatus.id === order.id2 ? (
                           
@@ -1031,7 +1049,7 @@ const toggle = async () => {
                     {/* Display items under the order when expanded */}
                     {expandedOrders.has(order.id2) && (
                       <TableRow>
-                        <TableCell colSpan={7} className="bg-gray-100">
+                        <TableCell colSpan={10} className="bg-gray-100">
                           <ul>
                             {Array.isArray(order.items) && order.items.length ? (
                               
@@ -1068,7 +1086,7 @@ const toggle = async () => {
                                   {item.image && <img src={item.image} alt={item.itemname } className="w-16 h-16" />}
                                 </td>
                                 <td className="py-2">
-                                  {item.price && <span>${item.price.toFixed(2)}</span>}
+                                  {item.price && <span>{item.price.toFixed(2)}₪</span>}
                                 </td>
                                 <td>
                                 {EditingitemQuantity && EditingitemQuantity.id1 === item.id1 ? (
@@ -1154,7 +1172,7 @@ const toggle = async () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-4">
+                  <TableCell colSpan={10} className="text-center py-4">
                     No orders found
                   </TableCell>
                 </TableRow>
@@ -1170,13 +1188,15 @@ const toggle = async () => {
                 <TableHead>Date</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Total</TableHead>
+                <TableHead>Delivery Option</TableHead>
+                <TableHead>Delivery Fee</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoadingOrders && !useMockData ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-4">
+                  <TableCell colSpan={10} className="text-center py-4">
                     Loading orders...
                   </TableCell>
                 </TableRow>
@@ -1213,7 +1233,9 @@ const toggle = async () => {
                           </span>
                         )}
                       </TableCell>
-                      <TableCell>${order.total.toFixed(2)}</TableCell>
+                      <TableCell>{order.total.toFixed(2)}₪</TableCell>
+                      <TableCell>{order.deliveryOption}</TableCell>
+                     <TableCell>{Number(order.deliveryFee).toFixed(2)}₪</TableCell>
                       <TableCell>
                         {editingOrderStatus && editingOrderStatus.id === order.id2 ? (
                           
@@ -1297,7 +1319,7 @@ const toggle = async () => {
                     {/* Display items under the order when expanded */}
                     {expandedOrders.has(order.id2) && (
                       <TableRow>
-                        <TableCell colSpan={7} className="bg-gray-100">
+                        <TableCell colSpan={10} className="bg-gray-100">
                           <ul>
                             {Array.isArray(order.items) && order.items.length ? (
                               
@@ -1310,6 +1332,7 @@ const toggle = async () => {
                               <th className="text-left">Image</th>
                               <th className="text-left">Price</th>
                               <th className="text-left">Action</th>
+                              
                             </tr>
                           </thead>
                           <tbody>
@@ -1334,7 +1357,7 @@ const toggle = async () => {
                                   {item.image && <img src={item.image} alt={item.itemname} className="w-16 h-16" />}
                                 </td>
                                 <td className="py-2">
-                                  {item.price && <span>${item.price.toFixed(2)}</span>}
+                                  {item.price && <span>{item.price.toFixed(2)}₪</span>}
                                 </td>
                                 <td>
                                 {EditingitemQuantity && EditingitemQuantity.id1 === item.id1 ? (
@@ -1420,13 +1443,14 @@ const toggle = async () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-4">
+                  <TableCell colSpan={10} className="text-center py-4">
                     No orders found
                   </TableCell>
                 </TableRow>
                 )}
             </TableBody>
-          </Table>)))}
+          </Table>
+        )))}
 
         </div>
       </div>

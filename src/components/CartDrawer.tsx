@@ -19,6 +19,7 @@ import {  Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '
 import { Label } from '@/components/ui/label';
 
 import { Input } from './ui/input';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 interface CartDrawerProps {
   isOpen: boolean;
   onClose: () => void;
@@ -35,7 +36,20 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [guestName, setGuestName] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deliveryOption, setDeliveryOption] = useState('pickup');
+  const getDeliveryFee = () => {
+    switch (deliveryOption) {
+      case'west bank':
+        return 20;
+      case 'jerusalem':
+        return 50;
+      case 'interior':
+        return 70;
+      default:
+        return 0;
+    }
+  };
     const handleClose = () => {
       setPhoneNumber('');
       setIsSubmitting(false);
@@ -116,6 +130,8 @@ const handleOrderSubmitwithoutverify = async () => {
     userId: user.id,
     userName: user.name,
     total: subtotal,
+    deliveryOption: deliveryOption,
+    deliveryFee: getDeliveryFee(),
     items: cartItems.map(item => ({
       id1: item.id1, // Ensure id1 is used
       itemname: item.name,
@@ -163,6 +179,8 @@ const handleGuestOrderSubmit = async () => {
     userName: guestName,
     phone: guestPhone,
     total: subtotal,
+    deliveryOption: deliveryOption,
+        deliveryFee: getDeliveryFee(),
     items: cartItems.map(item => ({
       id1: item.id1,
       itemname: item.name,
@@ -206,6 +224,9 @@ const handleGuestOrderSubmit = async () => {
         userId: user.id,
         userName: user.name,
         total: subtotal,
+        deliveryOption: deliveryOption,
+        deliveryFee: getDeliveryFee(),
+
         items: cartItems.map(item => ({
           id1: item.id1, // Ensure id1 is used
           itemname: item.name,
@@ -283,6 +304,8 @@ const handleGuestOrderSubmit = async () => {
 
     fetchStatus();
   }, []);
+  const deliveryFee = getDeliveryFee();
+  const total = subtotal + deliveryFee;
   return (
     <>
       <Sheet open={isOpen} onOpenChange={onClose}>
@@ -356,10 +379,67 @@ const handleGuestOrderSubmit = async () => {
           {user  && cartItems.length > 0 && (
             <SheetFooter className="border-t pt-4 mt-4">
               <div className="w-full space-y-4">
-                <div className="flex justify-between text-base font-medium">
+              <div className="flex justify-between py-2 ">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>${subtotal.toFixed(2)}₪</span>
                 </div>
+                <div className="flex justify-between py-2">
+                <span>Delivery fees:</span>
+                <span>{deliveryFee.toFixed(2)}₪</span>
+              </div>
+              <div className="flex justify-between py-2 font-bold">
+                <span>Total:</span>
+                <span>{total.toFixed(2)}₪</span>
+              </div>
+              <div className="space-y-2">
+              <label className="font-medium">Delivery options</label>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <input
+                    type="radio"
+                    id="pickup"
+                    name="delivery"
+                    value="pickup"
+                    checked={deliveryOption === "pickup"}
+                    onChange={() => setDeliveryOption("pickup")}
+                  />
+                  <label htmlFor="pickup">Pick up from the store (no fees)</label>
+                </div>
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <input
+                    type="radio"
+                    id="west bank"
+                    name="delivery"
+                    value="west bank"
+                    checked={deliveryOption === "west bank"}
+                    onChange={() => setDeliveryOption("west bank")}
+                  />
+                  <label htmlFor="west bank">Delivery to the West Bank (20 NIS)</label>
+                </div>
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <input
+                    type="radio"
+                    id="jerusalem"
+                    name="delivery"
+                    value="jerusalem"
+                    checked={deliveryOption === "jerusalem"}
+                    onChange={() => setDeliveryOption("jerusalem")}
+                  />
+                  <label htmlFor="jerusalem">Delivery to Jerusalem (50 NIS)</label>
+                </div>
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <input
+                    type="radio"
+                    id="interior"
+                    name="delivery"
+                    value="interior"
+                    checked={deliveryOption === "interior"}
+                    onChange={() => setDeliveryOption("interior")}
+                  />
+                  <label htmlFor="interior">Delivery to the occupied territories (70 NIS)</label>
+                </div>
+              </div>
+            </div>
                 
                 <div className="flex flex-col space-y-2">
                   <Button 
@@ -385,11 +465,67 @@ const handleGuestOrderSubmit = async () => {
           {isOnoff && !user  && cartItems.length > 0 && (
             <SheetFooter className="border-t pt-4 mt-4">
               <div className="w-full space-y-4">
-                <div className="flex justify-between text-base font-medium">
+                <div className="flex justify-between py-2 ">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>${subtotal.toFixed(2)}₪</span>
                 </div>
-                
+                <div className="flex justify-between py-2">
+                <span>Delivery fees:</span>
+                <span>{deliveryFee.toFixed(2)}₪</span>
+              </div>
+              <div className="flex justify-between py-2 font-bold">
+                <span>Total:</span>
+                <span>{total.toFixed(2)}₪</span>
+              </div>
+              <div className="space-y-2">
+              <label className="font-medium">Delivery options</label>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <input
+                    type="radio"
+                    id="pickup"
+                    name="delivery"
+                    value="pickup"
+                    checked={deliveryOption === "pickup"}
+                    onChange={() => setDeliveryOption("pickup")}
+                  />
+                  <label htmlFor="pickup">Pick up from the store (no fees)</label>
+                </div>
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <input
+                    type="radio"
+                    id="west bank"
+                    name="delivery"
+                    value="west bank"
+                    checked={deliveryOption === "west bank"}
+                    onChange={() => setDeliveryOption("west bank")}
+                  />
+                  <label htmlFor="west bank">Delivery to the West Bank (20 NIS)</label>
+                </div>
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <input
+                    type="radio"
+                    id="jerusalem"
+                    name="delivery"
+                    value="jerusalem"
+                    checked={deliveryOption === "jerusalem"}
+                    onChange={() => setDeliveryOption("jerusalem")}
+                  />
+                  <label htmlFor="jerusalem">Delivery to Jerusalem (50 NIS)</label>
+                </div>
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <input
+                    type="radio"
+                    id="interior"
+                    name="delivery"
+                    value="interior"
+                    checked={deliveryOption === "interior"}
+                    onChange={() => setDeliveryOption("interior")}
+                  />
+                  <label htmlFor="interior">Delivery to the occupied territories (70 NIS)</label>
+                </div>
+              </div>
+            </div>
                 <div className="flex flex-col space-y-2">
                   <Button 
                     onClick={handleCheckoutGuest} 

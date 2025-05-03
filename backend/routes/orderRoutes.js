@@ -25,7 +25,7 @@ router.put('/edit/item/:itemId', orderController.edititemQuantity);
 // // Delete order (admin only)
 router.delete('/:orderId', orderController.deleteOrder);
 router.delete('/item/:itemId', orderController.deleteitem);
-
+router.post('/track', orderController.trackOrderByPhone);
 
 
 module.exports = router;

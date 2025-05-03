@@ -65,11 +65,15 @@ const Navbar = () => {
               <Link to="/products" className="font-medium hover:text-primary">
                 Products
               </Link>
+              <Link to="/order-tracker" className="font-medium hover:text-primary">
+                Track Order
+              </Link>
               {user && (
                 <Link to="/orders" className="font-medium hover:text-primary">
                   My Orders
                 </Link>
               )}
+              
               {user?.role === 'admin' && (
                 <Link to="/admin" className="font-medium hover:text-primary">
                   Admin Dashboard
@@ -148,6 +152,13 @@ const Navbar = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Products
+            </Link>
+            <Link 
+              to="/order-tracker" 
+              className="block py-2 px-4 hover:bg-muted rounded"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Track Order
             </Link>
             {user && (
               <Link 

@@ -131,6 +131,7 @@ const OrdersPage = () => {
                               <th className="text-left">Item</th>
                               <th className="text-left">Image</th>
                               <th className="text-left">Quantity</th>
+
                               <th className="text-left">Price</th>
                             </tr>
                           </thead>
@@ -145,7 +146,7 @@ const OrdersPage = () => {
                                 <td className="py-2">{item.quantity}</td>
                                 
                                 <td className="py-2">
-                                  {item.price && <span>${item.price.toFixed(2)}</span>}
+                                  {item.price && <span>{item.price.toFixed(2)}₪</span>}
                                 </td>
                               </tr>
                             ))}
@@ -153,9 +154,20 @@ const OrdersPage = () => {
                         </table>
                   </div>
                   
+                  <div className="mt-4 pt-4  flex justify-between font-medium">
+                    <span>Sub Total</span>
+                    <span>{order.total.toFixed(2)}₪</span>
+                    
+                  </div>
+                  <div className="mt-4 pt-4  flex justify-between font-medium">
+                    <span>Delivery Fee</span>
+                    <span>{Number(order.deliveryFee).toFixed(2)}₪</span>
+                    
+                  </div>
                   <div className="mt-4 pt-4 border-t flex justify-between font-medium">
                     <span>Total</span>
-                    <span>${order.total.toFixed(2)}</span>
+                    <span>{(Number(order.deliveryFee)+order.total).toFixed(2)}₪</span>
+                    
                   </div>
                 </div>
               ))}

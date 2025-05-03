@@ -33,6 +33,8 @@ const orderController = {
           userId: order.userId,
           userName: order.userName,
           total: order.total,
+          deliveryFee: order.deliveryFee,
+          deliveryOption: order.deliveryOption,
           phone: order.phone,
           status: order.status,
           date: order.date,
@@ -182,6 +184,8 @@ const fullProductDetails = await Product.find({ id1: { $in: topProductIds } });
         total: orderData.total,
         userName: orderData.userName,
         phone:user.phone,
+        deliveryOption: orderData.deliveryOption,
+        deliveryFee: orderData.deliveryFee,
         status: 'pending',
         items: orderData.items.map(item => ({
           id1: item.id1, // Corrected field name to match your schema
@@ -233,6 +237,8 @@ const fullProductDetails = await Product.find({ id1: { $in: topProductIds } });
         total: orderData.total,
         userName: orderData.userName,
         phone:orderData.phone,
+        deliveryOption: orderData.deliveryOption,
+        deliveryFee: orderData.deliveryFee,
         status: 'pending',
         items: orderData.items.map(item => ({
           id1: item.id1, // Corrected field name to match your schema
@@ -471,6 +477,8 @@ const fullProductDetails = await Product.find({ id1: { $in: topProductIds } });
           userId: order.userId,
           userName: order.userName,
           total: order.total,
+          deliveryOption: order.deliveryOption,
+          deliveryFee: order.deliveryFee,
           status: order.status,
           date: order.date,
           phone:order.phone,
@@ -501,8 +509,34 @@ const fullProductDetails = await Product.find({ id1: { $in: topProductIds } });
       console.error('Error deleting order:', error);
       res.status(500).json({ error: 'Failed to delete order' });
     }
-  }
+  },
+  trackOrderByPhone: async (req, res) => {
+    try {
+      const { phoneNumber } = req.body;
+  
+      const orders = await Order.find({ phone: phoneNumber });
+  
+      if (!orders || orders.length === 0) {
+        return res.status(404).json({ message: 'No orders found for this phone number' });
+      }
+  
+      // Filter only delivered orders
+      const deliveredOrders = orders.filter(order => order.status !== 'delivered');
+  
+      if (deliveredOrders.length === 0) {
+        return res.status(404).json({ message: 'No delivered orders found for this phone number' });
+      }
+  
+      res.json(deliveredOrders);
+    } catch (error) {
+      console.error('Error fetching orders by phone:', error);
+      res.status(500).json({ message: 'Error fetching orders', error });
+    }
+  },
+  
 };
+ 
+
 //delete item from order
 
 

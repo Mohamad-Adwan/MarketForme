@@ -35,6 +35,8 @@ export interface Order {
   date: string;
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   total: number;
+  deliveryOption: string;
+  deliveryFee: number;
   items: {
     map(arg0: (item: any, index: any) => JSX.Element): import("react").ReactNode;
     id1: number;

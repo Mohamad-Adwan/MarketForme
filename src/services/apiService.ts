@@ -293,6 +293,11 @@ export const orderApi = {
         method: 'PUT',
         body: JSON.stringify({ orderId, quantity }),
       }),
+  trackOrderByPhone: (phoneNumber: string) =>
+    apiRequest('orders/track', {
+      method: 'POST',
+      body: JSON.stringify({ phoneNumber }),
+    }),
 
 };
 export const globalApi=
