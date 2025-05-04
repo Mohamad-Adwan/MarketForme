@@ -21,11 +21,14 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
+  LineChart,
+  Line,
 } from 'recharts';
+import { Button } from '@/components/ui/button';
 import { getStatusColor } from './AdminUtils';
 import {  authApi, orderApi, productApi } from '@/services/apiService';
 import { set } from 'date-fns';
-
+import { parseISO, format, getWeek, getMonth, getYear } from 'date-fns';
 interface DashboardOverviewProps {
   stats: Stats;
   displayOrders: Order[];
@@ -44,6 +47,8 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   const [localStats, setLocalStats] = useState<Stats>(stats);
   const [topproduct, settopproduct] = useState<Product[]>(products);
   const [topOrders, setTopOrders] = useState<Order[]>(displayOrders);
+  const [chartType, setChartType] = useState<'bar' | 'line'>('line');
+  const [timeframe, setTimeframe] = useState<'daily' | 'weekly' | 'monthly' | 'annually'>('daily');
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -82,6 +87,38 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
     fetchStats();
   
   }, []);
+  const getTimeframedData = () => {
+    const sales = localStats.recentSales;
+  
+    const grouped: Record<string, number> = {};
+  
+    sales.forEach(({ date, amount }) => {
+      const parsedDate = parseISO(date); // assuming date is ISO string
+      let key = '';
+  
+      switch (timeframe) {
+        case 'weekly':
+          key = `Week ${getWeek(parsedDate)}`;
+          break;
+        case 'monthly':
+          key = format(parsedDate, 'MMM'); // "Jan", "Feb", etc.
+          break;
+        case 'annually':
+          key = getYear(parsedDate).toString();
+          break;
+        default:
+          key = format(parsedDate, 'yyyy-MM-dd'); // daily
+      }
+  
+      if (!grouped[key]) grouped[key] = 0;
+      grouped[key] += amount;
+    });
+  
+    // Convert the grouped object to array format
+    return Object.entries(grouped).map(([date, amount]) => ({ date, amount }));
+  };
+
+  const chartData = getTimeframedData();
   return (
     <div className="space-y-8">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -186,7 +223,65 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       
       
       <div className="bg-white p-6 rounded-lg shadow w-full max-w-7xl h-[770px]">
-        <h3 className="text-xl font-semibold mb-4">Weekly Sales</h3>
+      <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold">Sales Chart</h3>
+          
+          <div className="flex items-center gap-2">
+            <div className="flex items-center rounded-lg border border-input overflow-hidden">
+              <Button 
+                variant={chartType === 'bar' ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setChartType('bar')}
+                className="h-8 rounded-none"
+              >
+                Bar
+              </Button>
+              <Button 
+                variant={chartType === 'line' ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setChartType('line')}
+                className="h-8 rounded-none"
+              >
+                Line
+              </Button>
+            </div>
+            
+            <div className="flex items-center rounded-lg border border-input overflow-hidden">
+              <Button 
+                variant={timeframe === 'daily' ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setTimeframe('daily')}
+                className="h-8 rounded-none"
+              >
+                Daily
+              </Button>
+              <Button 
+                variant={timeframe === 'weekly' ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setTimeframe('weekly')}
+                className="h-8 rounded-none"
+              >
+                Weekly
+              </Button>
+              <Button 
+                variant={timeframe === 'monthly' ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setTimeframe('monthly')}
+                className="h-8 rounded-none"
+              >
+                Monthly
+              </Button>
+              <Button 
+                variant={timeframe === 'annually' ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setTimeframe('annually')}
+                className="h-8 rounded-none"
+              >
+                Annually
+              </Button>
+            </div>
+          </div>
+        </div>
         <div className="h-80">
           <ChartContainer
             config={{
@@ -200,7 +295,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             }}
           >
             
-            <BarChart data={localStats.recentSales}>
+            {/* <BarChart data={localStats.recentSales}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
               <YAxis />
@@ -238,8 +333,93 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 fill="hsl(var(--primary))"
                 radius={[4, 4, 0, 0]}
               />
-            </BarChart>
-          </ChartContainer>
+            </BarChart>*/}
+            {chartType === 'bar' ? (
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="rounded-lg border bg-background p-2 shadow-sm">
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="flex flex-col">
+                              <span className="text-[0.70rem] uppercase text-muted-foreground">
+                                {timeframe === 'daily' ? 'Day' : timeframe === 'weekly' ? 'Week' : timeframe === 'monthly' ? 'Month' : 'Year'}
+                              </span>
+                              <span className="font-bold text-muted-foreground">
+                                {payload[0].payload.date}
+                              </span>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-[0.70rem] uppercase text-muted-foreground">
+                                Sales
+                              </span>
+                              <span className="font-bold">
+                                ${payload[0].payload.amount.toFixed(2)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    }
+                    return null
+                  }}
+                />
+                <Bar
+                  dataKey="amount"
+                  fill="hsl(var(--primary))"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            ) : (
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="rounded-lg border bg-background p-2 shadow-sm">
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="flex flex-col">
+                              <span className="text-[0.70rem] uppercase text-muted-foreground">
+                                {timeframe === 'daily' ? 'Day' : timeframe === 'weekly' ? 'Week' : timeframe === 'monthly' ? 'Month' : 'Year'}
+                              </span>
+                              <span className="font-bold text-muted-foreground">
+                                {payload[0].payload.date}
+                              </span>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-[0.70rem] uppercase text-muted-foreground">
+                                Sales
+                              </span>
+                              <span className="font-bold">
+                                ${payload[0].payload.amount.toFixed(2)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    }
+                    return null
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="amount"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  dot={{ r: 4 }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            )}
+          </ChartContainer> 
+          
         </div>
       </div>
       

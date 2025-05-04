@@ -70,11 +70,11 @@ const orderController = {
       const deliveredOrders = allorder.filter(order => order.status === 'delivered').length;
       const shippedOrders = allorder.filter(order => order.status === 'shipped').length;
       const processingOrders = allorder.filter(order => order.status === 'processing').length;
-      console.log('pendingOrders:', pendingOrders);
-      console.log('canceledOrders:', canceledOrders);
-      console.log('deliveredOrders:', deliveredOrders);
-      console.log('shippedOrders:', shippedOrders);
-      console.log('processingOrders:', processingOrders);
+      // console.log('pendingOrders:', pendingOrders);
+      // console.log('canceledOrders:', canceledOrders);
+      // console.log('deliveredOrders:', deliveredOrders);
+      // console.log('shippedOrders:', shippedOrders);
+      // console.log('processingOrders:', processingOrders);
       // Calculate recentSales grouped by date for delivered orders
       const recentSales = orders.reduce((acc, order) => {
         if (order.status === 'delivered') { // Ensure we only count delivered orders

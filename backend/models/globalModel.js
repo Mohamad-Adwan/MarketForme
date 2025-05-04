@@ -9,6 +9,18 @@ const globalsSchema = new mongoose.Schema({
   allowmakeorder: {
     type: Boolean,
     default: true,
+  },
+  delivery:{
+    westbank:{
+      type:Number,
+    },
+    jerusalem:{
+      type:Number,  
+    },
+    occupiedinterior:{
+      type:Number,
+    }
+    
   }
   // Add more global toggles if needed
 }, { timestamps: true });

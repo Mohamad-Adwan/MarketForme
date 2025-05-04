@@ -38,14 +38,22 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const [guestPhone, setGuestPhone] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deliveryOption, setDeliveryOption] = useState('pickup');
+const [fees, setfees] = useState({
+  westbank: 0,
+  jerusalem: 0,
+  occupiedinterior: 0,
+}
+
+);
   const getDeliveryFee = () => {
+    
     switch (deliveryOption) {
       case'west bank':
-        return 20;
+        return fees.westbank;
       case 'jerusalem':
-        return 50;
+        return fees.jerusalem;
       case 'interior':
-        return 70;
+        return fees.occupiedinterior;
       default:
         return 0;
     }
@@ -281,6 +289,8 @@ const handleGuestOrderSubmit = async () => {
     const fetchStatus = async () => {
       try {
         const response = await globalApi.getmakeorder();
+        const response2 = await globalApi.getdelivery();
+        setfees(response2);
         // Assuming response = { showPrice: true/false }
         setisOnOff(response.showPrice || false);
       } catch (error) {
@@ -338,7 +348,7 @@ const handleGuestOrderSubmit = async () => {
                     <div className="ml-4 flex-1">
                       <h3 className="text-sm font-medium">{item.name}</h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        ${item.price.toFixed(2)}
+                        {item.price.toFixed(2)}₪
                       </p>
                     </div>
                     
@@ -381,7 +391,7 @@ const handleGuestOrderSubmit = async () => {
               <div className="w-full space-y-4">
               <div className="flex justify-between py-2 ">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}₪</span>
+                  <span>{subtotal.toFixed(2)}₪</span>
                 </div>
                 <div className="flex justify-between py-2">
                 <span>Delivery fees:</span>
@@ -414,7 +424,7 @@ const handleGuestOrderSubmit = async () => {
                     checked={deliveryOption === "west bank"}
                     onChange={() => setDeliveryOption("west bank")}
                   />
-                  <label htmlFor="west bank">Delivery to the West Bank (20 NIS)</label>
+                  <label htmlFor="west bank">Delivery to the West Bank ({fees.westbank} NIS)</label>
                 </div>
                 <div className="flex items-center space-x-2 space-x-reverse">
                   <input
@@ -425,7 +435,7 @@ const handleGuestOrderSubmit = async () => {
                     checked={deliveryOption === "jerusalem"}
                     onChange={() => setDeliveryOption("jerusalem")}
                   />
-                  <label htmlFor="jerusalem">Delivery to Jerusalem (50 NIS)</label>
+                  <label htmlFor="jerusalem">Delivery to Jerusalem ({fees.jerusalem} NIS)</label>
                 </div>
                 <div className="flex items-center space-x-2 space-x-reverse">
                   <input
@@ -436,7 +446,7 @@ const handleGuestOrderSubmit = async () => {
                     checked={deliveryOption === "interior"}
                     onChange={() => setDeliveryOption("interior")}
                   />
-                  <label htmlFor="interior">Delivery to the occupied territories (70 NIS)</label>
+                  <label htmlFor="interior">Delivery to the occupied territories ({fees.occupiedinterior} NIS)</label>
                 </div>
               </div>
             </div>
@@ -500,7 +510,7 @@ const handleGuestOrderSubmit = async () => {
                     checked={deliveryOption === "west bank"}
                     onChange={() => setDeliveryOption("west bank")}
                   />
-                  <label htmlFor="west bank">Delivery to the West Bank (20 NIS)</label>
+                  <label htmlFor="west bank">Delivery to the West Bank ({fees.westbank} NIS)</label>
                 </div>
                 <div className="flex items-center space-x-2 space-x-reverse">
                   <input
@@ -511,7 +521,7 @@ const handleGuestOrderSubmit = async () => {
                     checked={deliveryOption === "jerusalem"}
                     onChange={() => setDeliveryOption("jerusalem")}
                   />
-                  <label htmlFor="jerusalem">Delivery to Jerusalem (50 NIS)</label>
+                  <label htmlFor="jerusalem">Delivery to Jerusalem ({fees.jerusalem} NIS)</label>
                 </div>
                 <div className="flex items-center space-x-2 space-x-reverse">
                   <input
@@ -522,7 +532,7 @@ const handleGuestOrderSubmit = async () => {
                     checked={deliveryOption === "interior"}
                     onChange={() => setDeliveryOption("interior")}
                   />
-                  <label htmlFor="interior">Delivery to the occupied territories (70 NIS)</label>
+                  <label htmlFor="interior">Delivery to the occupied territories ({fees.occupiedinterior} NIS)</label>
                 </div>
               </div>
             </div>

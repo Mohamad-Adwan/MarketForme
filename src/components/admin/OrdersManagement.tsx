@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { globalApi, orderApi } from '@/services/apiService';
 import { Input } from '@/components/ui/input';
 import { Calendar } from '@/components/ui/calendar';
-import { format, isAfter, isBefore, isValid, parseISO } from 'date-fns';
+
+import { format, isAfter, isBefore, isValid, parseISO, set } from 'date-fns';
 import {
   Table,
   TableBody,
@@ -26,7 +27,8 @@ import {
   Package,
   ChevronDown,
   ChevronRight,
-  User
+  User,
+  Settings
 } from 'lucide-react';
 import { faFilePdf } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -56,6 +58,12 @@ import {
 } from "@/components/ui/popover";
 import { toast } from 'sonner';
 import { Card, CardContent } from '../ui/card';
+import * as z from 'zod';
+import { useForm } from 'react-hook-form';
+import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+
 type GroupedOrders = {
   [key: string]: {
     count: number;
@@ -78,7 +86,48 @@ const OrdersManagement: React.FC = () => {
   const [dateFilter, setDateFilter] = useState<DateRangeFilter>({});
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [deletingOrderId, setDeletingOrderId] = useState<number | null>(null);
+  const [isDeliveryFeeDialogOpen, setIsDeliveryFeeDialogOpen] = useState(false);
   const [isOnoff, setisOnOff] = useState(false);
+  const [fees, setFees] = useState({
+    westBank: 0,
+    jerusalem: 0,
+    interior: 0,
+  });
+  const deliveryFeeSchema = z.object({
+    westBank: z.coerce.number().min(0),
+    jerusalem: z.coerce.number().min(0),
+    interior: z.coerce.number().min(0),
+  });
+  type DeliveryFeeFormValues = z.infer<typeof deliveryFeeSchema>;
+  
+  const handlefess = async () => {
+    try {
+      const response = await globalApi.getdelivery();
+      if (response) {
+        const updatedFees = {
+          westBank: response.westbank,
+          jerusalem: response.jerusalem,
+          interior: response.occupiedinterior,
+        };
+        setFees(updatedFees);
+      form.reset(updatedFees); 
+      } else {
+        console.error('No delivery fees found');
+      }
+    } catch (error) {
+      console.error('Error fetching delivery fees:', error);
+    }
+  };
+  const form = useForm<DeliveryFeeFormValues>({
+    
+    resolver: zodResolver(deliveryFeeSchema),
+    defaultValues: {
+      westBank: fees.westBank,
+      jerusalem: fees.jerusalem,
+      interior: fees.interior,
+    },
+  });
+  
   const fetchOrders = async () => {
     const respon = await globalApi.getmakeorder();
     setisOnOff(respon.allowmakeorder);     
@@ -143,7 +192,12 @@ const OrdersManagement: React.FC = () => {
   };
   useEffect(() => {
     fetchOrders();
+    handlefess();
+    
+  
+
   }, []);
+  
 
   const handleedititemQuantity = async (id2: number, id1: number) => {
    const respon = await orderApi.edititemQuantity(id2, id1, Number(inputValue));
@@ -244,11 +298,87 @@ const toggle = async () => {
     await globalApi.printPDF(orderId);
     toast.success('PDF generated successfully');
   }
+  ///////////////////////////////////////
+  const handleDeliveryFeeSubmit = async (values: DeliveryFeeFormValues) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      // Send delivery fee updates to backend
+      const response = await globalApi.setdelivery(token, values.westBank,values.jerusalem, values.interior,);
+      toast.success('Delivery fees updated successfully');
+      setIsDeliveryFeeDialogOpen(false);
+    } catch (error) {
+      console.error('Error updating delivery fees:', error);
+      
+     
+    }
+  };
   return (
     <>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Orders Management</h2>
         <div className="flex gap-2">
+        <Dialog open={isDeliveryFeeDialogOpen} onOpenChange={setIsDeliveryFeeDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Settings className="h-4 w-4 mr-2" />
+                Delivery Fees
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Manage Delivery Fees</DialogTitle>
+                <DialogDescription>
+                  Set the delivery fees for different areas. These values will be used when calculating order totals.
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleDeliveryFeeSubmit)} className="space-y-4">
+                <FormField
+                    control={form.control}
+                    name="westBank"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>West Bank Delivery Fee (₪)</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} min="0" step="1.00" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="jerusalem"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Jerusalem Delivery Fee (₪)</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} min="0" step="1.00" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="interior"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Interior Delivery Fee (₪)</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} min="0" step="1.00" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <DialogFooter>
+                    <Button type="submit">Save Changes</Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+          
         <div className="flex items-center gap-3">
         <span className="text-lg font-semibold">Allow Order</span>
         <button

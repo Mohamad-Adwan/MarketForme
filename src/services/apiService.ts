@@ -302,8 +302,10 @@ export const orderApi = {
 };
 export const globalApi=
 {
-
-getStatus:()=>apiRequest('global/getpriceState'),
+  
+getStatus:(token:string)=>apiRequest('global/getpriceState',{
+  headers: { Authorization: `Bearer ${token}` },
+}),
 
 setStatus:(status:boolean)=>apiRequest('global/putpriceState',
   {
@@ -319,6 +321,15 @@ setmakeorder:(status:boolean)=>apiRequest('global/putmakeorder',
     body: JSON.stringify({ status }),
   }
 ),
+setdelivery:(token :string,westbank:number, jerusalem:number, occupiedinterior:number)=>apiRequest('global/putdelivery',
+  {
+    method: 'PUT',
+    body: JSON.stringify({ westbank , jerusalem, occupiedinterior }),
+     headers: { Authorization: `Bearer ${token}`},
+  }
+  
+),
+getdelivery:()=>apiRequest('global/getdelivery'),
 printPDF: (orderId: number) => {
   return apiRequest('global/printPDF', {
     method: 'GET', // Use GET since we are fetching a file

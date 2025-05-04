@@ -3,9 +3,18 @@ const PDFDocument = require('pdfkit');
 const Order = require('../models/orderModel');
 const fs = require('fs');
 const path = require('path');
+const jwt = require('jsonwebtoken');
+
+
 const globalController = {
   getstatus: async (req, res) => {
     try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Authorization token is required' });
+      }
+      
+  
       const statuses = await Global.findOne(); // Only one expected
       res.status(200).json({showPrice:statuses.showPrice});
     } catch (err) {
@@ -13,7 +22,41 @@ const globalController = {
       res.status(500).json({ error: "Failed to fetch global status" });
     }
   },
+setdelivery: async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Authorization token is required' });
+    }
+    const { westbank, jerusalem, occupiedinterior } = req.body;
 
+    let globalDoc = await Global.findOne();
+
+    if (!globalDoc) {
+      globalDoc = new Global({ delivery: { westbank, jerusalem, occupiedinterior } });
+    } else {
+      globalDoc.delivery.westbank = westbank;
+      globalDoc.delivery.jerusalem = jerusalem;
+      globalDoc.delivery.occupiedinterior = occupiedinterior;
+    }
+
+    await globalDoc.save();
+
+    res.status(200).json(globalDoc);
+  } catch (err) {
+    console.error("Set Status Error:", err);
+    res.status(500).json({ error: "Failed to update global status" });
+  }
+},
+  getdelivery: async (req, res) => {
+    try {
+      const statuses = await Global.findOne(); // Only one expected
+      res.status(200).json({westbank:statuses.delivery.westbank,jerusalem:statuses.delivery.jerusalem,occupiedinterior:statuses.delivery.occupiedinterior});
+    } catch (err) {
+      console.error("Get Status Error:", err);
+      res.status(500).json({ error: "Failed to fetch global status" });
+    }
+  },
   setstatus: async (req, res) => {
     try {
       const { status } = req.body;

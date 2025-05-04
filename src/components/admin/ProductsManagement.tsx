@@ -46,7 +46,8 @@ const ProductsManagement: React.FC<ProductsManagementProps> = ({
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const response = await globalApi.getStatus();
+        const token = localStorage.getItem('authToken');
+        const response = await globalApi.getStatus(token);
         // Assuming response = { showPrice: true/false }
         setisOnOff(response.showPrice || false);
       } catch (error) {
