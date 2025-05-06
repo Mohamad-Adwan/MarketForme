@@ -56,11 +56,11 @@ const ProductDetail = () => {
     // console.log(user);
     
   
-    await cartApi.addToCart(user.id,product.id1,1,product.price,product.name );  
+    // await cartApi.addToCart(user.id,product.id1,1,product.price,product.name );  
     
-    // setIsAdding(true);
-    // await addToCart(product);
-    // setIsAdding(false);
+     setIsAdding(true);
+    await addToCart(product);
+     setIsAdding(false);
   };
   useEffect(() => {
       const fetchCartItems = async () => {
