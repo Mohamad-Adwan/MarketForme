@@ -105,107 +105,100 @@ setdelivery: async (req, res) => {
     }
   },
   // In the backend controller
-  printPDF : async (req, res) => {
+  printPDF: async (req, res) => {
     const { orderId } = req.query;
-
   
-    const order = await Order.findOne({ id2: orderId }); // Replace with your actual DB call
+    const order = await Order.findOne({ id2: orderId });
     if (!order) return res.status(404).send('Order not found');
   
-    const doc = new PDFDocument({ margin: 50 });
+    const PDFDocument = require('pdfkit');
+    const doc = new PDFDocument({ size: 'A4', margin: 50 });
   
-    // Pipe to HTTP response
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=invoice-${orderId}.pdf`);
     doc.pipe(res);
+    const logoPath = path.join(__dirname, '..', 'images', 'logo.png');
+    if (fs.existsSync(logoPath)) {
+      doc.image(logoPath, 50, 45, { width: 50 });
+    }
+    // Header - Logo + Company Info
+    doc
+      .fontSize(20).font('Helvetica-Bold').text('Tech-Shop', 110, 57)
+      .fontSize(10).font('Helvetica')
+      .text('Tulkarm, West Bank', 110, 75)
+      .text('Phone: (970) 595-642-327', 110, 90)
+      .text('Email: support@Tech-Shop.com', 110, 105)
+      .moveDown();
   
-    // Company Info
-    doc.fontSize(18).font('Helvetica-Bold').text('Tech-Shop', { align: 'center' });
-    doc.fontSize(12).font('Helvetica').text('Tulkarm, West Bank', { align: 'left' });
-    doc.text('Phone: (970) 595-642-327', { align: 'left' });
-    doc.text('Email: support@Tech-Shop.com', { align: 'left' });
+    // Invoice title and meta
+    doc
+      .fillColor('#000')
+      .fontSize(24).font('Helvetica-Bold').text('Bill', 50, 130,{ align: 'center' })
+      .fontSize(12).font('Helvetica')
+      .text(`Invoice #: ${orderId}`, 400, 160)
+      .text(`Date: ${new Date().toLocaleDateString('en-GB')}`, 400, 175)
+      .text(`Due Date: ${new Date(order.date).toLocaleDateString('en-GB')}`, 400, 190)
+      .text(`Customer: ${order.userName}`, 400, 205)
+      .text(`Phone: ${order.phone}`, 400, 220);
   
-    doc.moveDown(2);
+    // Line separator
+    doc.moveTo(50, 240).lineTo(550, 240).stroke();
   
-    // Title
-    doc.fontSize(24).font('Helvetica-Bold').text('Invoice', { align: 'center' });
-    doc.moveDown(1);
+    // Items Table Header
+    doc
+      .fontSize(12).font('Helvetica-Bold')
+      .text('Item Name', 50, 250)
+      .text('Qty', 100, 250, { align: 'center' })
+      .text('Price', 250, 250, { align: 'center' })
+      .text('Total', 300, 250, { align: 'right' });
   
-    // Invoice Details
-    const dueDate = new Date(order.date).toLocaleDateString('en-GB');
-    const today = new Date().toLocaleDateString('en-GB');
+    doc.moveTo(50, 270).lineTo(550, 270).stroke();
   
-    doc.fontSize(12).font('Helvetica')
-      .text(`Invoice #${orderId}`, 405, doc.y, { align: 'left' })
-      .text(`Date: ${today}`, 405, doc.y + 10, { align: 'left' })
-      .text(`Due Date: ${dueDate}`, 405, doc.y + 15, { align: 'left' })
-      .text(`Customer: ${order.userName}`, 405, doc.y + 20, { align: 'left' })
-      .text(`Customer Number: ${order.phone}`, 405, doc.y + 25, { align: 'left' });
-  
-    doc.moveDown(4);
-  
-    // Table Header
-    doc.fontSize(12).font('Helvetica-Bold');
-    doc.text('Item Name', 50, doc.y);
-    doc.text('Qty', 320, doc.y-20, { align: 'center' });
-    doc.text('Price', 400, doc.y-15, { align: 'right' });
-  
-    // Header line
-    doc.moveTo(50, doc.y + 15).lineTo(550, doc.y + 15).strokeColor('#000').stroke();
-  
-    // Items
+    // Table Items
+    let y = 280;
     doc.font('Helvetica').fontSize(12);
-    let yPos = doc.y + 25;
-  
-    order.items.forEach((item) => {
-      doc.text(item.itemname, 50, yPos);
-      doc.text(item.quantity.toString(), 320, yPos, { align: 'center' });
-      doc.text(`$${item.price.toFixed(2)}`, 400, yPos, { align: 'right' });
-      yPos += 20;
+    order.items.forEach(item => {
+      const total = item.price * item.quantity;
+      doc
+        .text(item.itemname, 50, y)
+        .text(item.quantity.toString(), 100, y, { align: 'center' })
+        .text(`$${item.price.toFixed(2)}`, 250, y, { align: 'center' })
+        .text(`$${total.toFixed(2)}`, 300, y, { align: 'right' });
+      y += 20;
     });
   
-    // Divider
-    doc.moveTo(50, yPos).lineTo(550, yPos).stroke();
+    // Subtotal / Delivery / Total
+    y += 10;
+    doc.moveTo(50, y).lineTo(550, y).stroke();
+    y += 20;
   
-    // Totals
-    const tax = 0; // Example: 0% tax
-    const delivery = 20;
     const subtotal = order.total;
-    const total = subtotal + tax + delivery;
+    const delivery = order.deliveryFee || 0;
+    const total = subtotal + delivery;
   
-    yPos += 20;
     doc.font('Helvetica-Bold');
-    doc.text('Subtotal', 350, yPos, { align: 'left' });
-    doc.text(`$${subtotal.toFixed(2)}`, 470, yPos, { align: 'right' });
+    doc.text('Subtotal:', 250, y, { align: 'center' });
+    doc.text(`$${subtotal.toFixed(2)}`, 500, y, { align: 'right' });
   
-    yPos += 20;
-    doc.text('Tax (0%)', 350, yPos, { align: 'left' });
-    doc.text(`$${tax.toFixed(2)}`, 470, yPos, { align: 'right' });
+    y += 20;
+    doc.text('Delivery Fee:', 250, y, { align: 'center' });
+    doc.text(`$${delivery.toFixed(2)}`, 500, y, { align: 'right' });
   
-    yPos += 20;
-    doc.text('Delivery', 350, yPos, { align: 'left' });
-    doc.text(`$${delivery.toFixed(2)}`, 470, yPos, { align: 'right' });
-  
-    yPos += 25;
-    doc.fontSize(14).text('Total Amount Due', 350, yPos, { align: 'left' });
-    doc.text(`$${total.toFixed(2)}`, 470, yPos, { align: 'right' });
+    y += 20;
+    doc.fontSize(14).text('Total:', 250, y, { align: 'center' });
+    doc.text(`$${total.toFixed(2)}`, 500, y, { align: 'right' });
   
     // Footer
-    doc.moveDown(3);
-    doc.fontSize(10).font('Helvetica-Oblique').text(
-      'Thank you for your business! Payment is due within 30 days.\nIf you have any questions, contact us at support@Tech-Shop.com.',
-      50, // x-coordinate
-      yPos + 40, // optional: move it lower after totals
-      {
-        align: 'center',
-        width: 500
-      }
-    );
-    
+    y += 60;
+    doc
+      .fontSize(10).font('Helvetica-Oblique')
+      .text('Thank you for your business!', 50, y, { align: 'center', width: 500 })
+      .text('Payment is due within 30 days.', 50, y + 15, { align: 'center', width: 500 })
+      .text('For questions, contact support@Tech-Shop.com.', 50, y + 30, { align: 'center', width: 500 });
   
-    doc.end(); // Finalize the document
+    doc.end();
   },
-
+  
   
 };
 
