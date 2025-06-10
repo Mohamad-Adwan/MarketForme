@@ -12,13 +12,15 @@ import Layout from "./components/Layout";
 import HomePage from "./pages/HomePage";
 import ProductsPage from "./pages/ProductsPage";
 import ProductDetail from "./pages/ProductDetail";
+import ProjectDetail from "./pages/ProjectDetail";
+
 import AccountPage from "./pages/AccountPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import OrdersPage from "./pages/OrdersPage";
 import NotFound from "./pages/NotFound";
 import AdminRoute from "./components/AdminRoute";
 import OrderTrackerPage from "./pages/OrderTrackerPage";
-
+import OurProjectsPage from "./pages/OurProjectsPage";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -34,6 +36,8 @@ const App = () => (
                 <Route path="/" element={<HomePage />} />
                 <Route path="/products" element={<ProductsPage />} />
                 <Route path="/products/:id" element={<ProductDetail />} />
+                <Route path="/projects/:id" element={<ProjectDetail />} />
+                <Route path="/our-projects" element={<OurProjectsPage />}/>
                 <Route path="/account" element={<AccountPage />} />
                 <Route path="/admin" element={ <AdminRoute><AdminDashboard /></AdminRoute>} />
                 <Route path="/order-tracker" element={<OrderTrackerPage />} />

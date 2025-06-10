@@ -11,6 +11,14 @@ export interface Product {
   stock: number;
   discountprice:number;
 }
+export interface Project {
+  id4: number;
+  name: string;
+  description: string;
+  image: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 export interface User {
   id: string;

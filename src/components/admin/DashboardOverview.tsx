@@ -53,14 +53,14 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
     const fetchStats = async () => {
       try {
         const statsproduct = await productApi.getDashboard();
-        console.log('statsproduct:', statsproduct);
+        //console.log('statsproduct:', statsproduct);
 
         const statsorder = await orderApi.getDashboard();
-        console.log('statsorder:', statsorder);
+        //console.log('statsorder:', statsorder);
 
         const statsuser = await authApi.getDashboard();
 
-        console.log('statsuser', statsuser);
+        //console.log('statsuser', statsuser);
 
         setLocalStats({
           totalSales: statsorder.totalSales,
@@ -75,9 +75,9 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           shippedOrders: statsorder.shippedOrders,
         });
         settopproduct(statsorder.topProducts);
-        console.log('topproduct:', statsorder.topProducts);
+       // console.log('topproduct:', statsorder.topProducts);
         setTopOrders(statsorder.top5RecentOrders);
-        console.log('topOrders:', statsorder.top5RecentOrders);
+        //console.log('topOrders:', statsorder.top5RecentOrders);
       } catch (err) {
         console.error('Failed to fetch stats', err);
       }
@@ -398,7 +398,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                                 Sales
                               </span>
                               <span className="font-bold">
-                                ${payload[0].payload.amount.toFixed(2)}
+                                {payload[0].payload.amount.toFixed(2)}₪
                               </span>
                             </div>
                           </div>

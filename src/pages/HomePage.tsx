@@ -1,17 +1,24 @@
 
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Projector } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ProductCard from '@/components/ProductCard';
+import ProjectCard from '@/components/ProjectCard';
+
 import { getFeaturedProducts } from '@/data/products';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { productApi } from '@/services/apiService';
 import { useKeenSlider } from 'keen-slider/react'
 import 'keen-slider/keen-slider.min.css'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { projectApi } from '@/services/apiService';
+import { Project } from '@/types';
 
 const HomePage = () => {
   const [cartItems, setCartItems] = useState<Product[]>([]);
   const [products, setProducts] = useState<Product[]>([]); // To store fetched products
+  const [projects, setProjects] = useState<Project[]>([]); // To store fetched products
+
   type Product = {
     id1: number;
     name: string;
@@ -26,12 +33,15 @@ const HomePage = () => {
     
   };
   
+  
   // Fetch cart items
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
-        const items = await productApi.getAll(); // Assuming this fetches products
+        const items = await productApi.getAll(); 
         setCartItems(items);
+        const projectss = await projectApi.getAll(); 
+        setProjects(projectss);
       } catch (error) {
         console.error('Failed to fetch cart items:', error);
       }
@@ -141,11 +151,12 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-
+      <div className='bg-muted/50'>
+<section  >
       {products.some(product => product.discountprice && product.discountprice > 0) && (
   <div className="my-6">
     <h2 className="text-xl font-bold mb-4">🔥 Discounted Products</h2>
-    <div ref={sliderRef} className="keen-slider">
+    <div ref={sliderRef} className="keen-slider ">
       {products
         .filter(product => product.discountprice && product.discountprice > 0)
         .map((product, index) => (
@@ -159,8 +170,28 @@ const HomePage = () => {
     </div>
   </div>
 )}
-
-
+</section>
+{projects.length > 0 && (
+        <section className="py-16 ">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-2xl font-bold">Our Projects</h2>
+              <Link to="/our-projects" className="text-primary flex items-center hover:underline">
+                View All <ArrowRight className="h-4 w-4 ml-1" />
+              </Link>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {projects.slice(0, 3).map((project) => (
+                <div key={project.id4}>
+                <ProjectCard project={project} />
+                
+              </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
       {/* Featured Products */}
       <section className="py-16">
         <div className="container mx-auto px-4">
@@ -181,9 +212,9 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-      
+      </div>
       {/* Info Sections */}
-      <section className="bg-muted py-16">
+      <section className=" py-20 bg-muted/50 ">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-lg shadow-sm">
@@ -209,6 +240,7 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+      
     </div>
   );
 };

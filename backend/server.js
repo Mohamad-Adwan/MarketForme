@@ -18,6 +18,8 @@ const authRoutes = require('./routes/authRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const globalRoutes = require('./routes/globalRoutes');
+const projectRoutes = require('./routes/projectRoutes');
+
 
 const PORT = process.env.PORT || 3000;
 
@@ -43,6 +45,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/global',globalRoutes)
+app.use('/api/projects',projectRoutes)
+
 // Error handling middleware for database operations (uncomment when using a real database)
 app.use((err, req, res, next) => {
   console.error('Server error:', err);

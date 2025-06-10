@@ -21,6 +21,7 @@ import {
 
 import DashboardOverview from '@/components/admin/DashboardOverview';
 import ProductsManagement from '@/components/admin/ProductsManagement';
+import ProjectsManagement from '@/components/admin/ProjectsManagement';
 import OrdersManagement from '@/components/admin/OrdersManagement';
 import UsersManagement from '@/components/admin/UsersManagement';
 import { useAdminData } from '@/hooks/useAdminData';
@@ -68,7 +69,7 @@ const AdminDashboard = () => {
       
       
       <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-4 mb-8">
+        <TabsList className="grid grid-cols-5 mb-8">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <BarChart2 className="h-4 w-4" />
             <span>Overview</span>
@@ -76,6 +77,10 @@ const AdminDashboard = () => {
           <TabsTrigger value="products" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
             <span>Products</span>
+          </TabsTrigger>
+          <TabsTrigger value="projects" className="flex items-center gap-2">
+            <Package className="h-4 w-4" />
+            <span>Projects</span>
           </TabsTrigger>
           <TabsTrigger value="orders" className="flex items-center gap-2">
             <ShoppingCart className="h-4 w-4" />
@@ -112,7 +117,9 @@ const AdminDashboard = () => {
             handleImageChange={handleImageChange}
           />
         </TabsContent>
-        
+        <TabsContent value="projects">
+          <ProjectsManagement />
+        </TabsContent>
         <TabsContent value="orders">
           <OrdersManagement 
            // displayOrders={displayOrders}

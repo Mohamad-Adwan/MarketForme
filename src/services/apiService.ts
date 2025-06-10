@@ -1,5 +1,5 @@
 import { dbConfig } from '../config/dbConfig';
-import { Product, User, Order } from '../types';
+import { Product, User, Order, Project } from '../types';
 
 // Define the type for request options
 interface RequestOptions extends RequestInit {
@@ -351,4 +351,34 @@ printPDF: (orderId: number) => {
 },
 
 
+};
+export const projectApi = {
+  getAll: () => apiRequest('projects'),
+  getProjectById: (id: number) => apiRequest(`projects/${id}`),
+  // getFeatured: () => apiRequest('projects/featured'),
+  addProject: (formData: FormData) => 
+    apiRequestdata('projects', {
+      method: 'POST',
+       body: formData,
+    }),
+  updateProject: (id: number, formData: FormData) => 
+    apiRequestdata(`projects/${id}`, {
+      method: 'PUT',
+       body: formData,
+    }),
+  deleteProject: (id: number) => 
+    apiRequest(`projects/${id}`, {
+      method: 'DELETE',
+    }),
+  // uploadImage: (formData: FormData) => {
+  //   return fetch(`${dbConfig.apiUrl}/projects/upload-image`, {
+  //     method: 'POST',
+  //     body: formData,
+  //   }).then(response => {
+  //     if (!response.ok) {
+  //       throw new Error('Failed to upload image');
+  //     }
+  //     return response.json();
+  //   });
+  // },
 };

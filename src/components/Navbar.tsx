@@ -65,6 +65,9 @@ const Navbar = () => {
               <Link to="/products" className="font-medium hover:text-primary">
                 Products
               </Link>
+              <Link to="/our-projects"  className="font-medium hover:text-primary" >
+              Our Projects
+            </Link>
               <Link to="/order-tracker" className="font-medium hover:text-primary">
                 Track Order
               </Link>
@@ -159,6 +162,13 @@ const Navbar = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Track Order
+            </Link>
+             <Link 
+              to="/our-projects" 
+              className="block py-2 px-4 hover:bg-muted rounded"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Our Projects
             </Link>
             {user && (
               <Link 
